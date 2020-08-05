@@ -20,7 +20,8 @@ enum RrtPlannerType {
 };
 
 /**
- * @brief Different optimization objectives
+ * @brief Different optimization objectives. Additional custom objectives can
+ *        be easily added.
  */
 enum OptimizationObjective { kDefault = 0, kAltitude };
 
@@ -54,6 +55,7 @@ struct GlobalPlannerParams {
   double safety_factor;  // Safety factor for cross-agents collisions checking
   bool simplify_solution;
 
+  // Bounding box defining the space useful for planning
   Eigen::Vector3d lower_bound;
   Eigen::Vector3d upper_bound;
   double bounding_box_inflation;
@@ -61,17 +63,25 @@ struct GlobalPlannerParams {
   // Whether to trust an approximate solution (i.e., not necessarily reaching
   // the exact goal state).
   bool trust_approx_solution;
+
+  // Whether to consider unknown space to be free
   bool optimistic;
+
+  // Whether to use a min cost treshold on planning. If true, the planner
+  // returns the first solution whose cost is lower or equal this threshold.
   bool use_distance_threshold;
-  OptimizationObjective optimization_objective;
   double distance_threshold;
+
+  // Optimization objective, type of planner and planning strategy
+  OptimizationObjective optimization_objective;
+  PlanningStrategy planning_strategy;
   RrtPlannerType planner_type;
 
-  double goal_threshold;
+  // Auxiliary used only for altitude objective
   AltitudeObjectiveParams altitude_obj_params;
 
-  // Type of planning
-  PlanningStrategy planning_strategy;
+  // Defines the tolerance on the goal position when planning
+  double goal_threshold;
 
   // Type of interpolator
   Interpolator interpolator;

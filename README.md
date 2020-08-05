@@ -50,3 +50,6 @@ $ catkin build
 
 ## Troubleshooting
 * If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
+
+## Contributing
+Contributions that help improving the code are welcome. In case you want to contribute, please adapt to our C++ standards and run `bash clang-format-all .` on your code before committing.

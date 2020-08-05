@@ -395,6 +395,8 @@ class MultiRobotGlobalPlanner {
   GlobalPlannerParams params_;
   DynamicParams dynamic_params_;
   int num_agents_;
+
+  // Auxiliaries related to clocks and timers
   double timer_dt_;
   double clock_replanning_;
   int iter_timer_;
