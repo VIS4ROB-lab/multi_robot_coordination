@@ -1,0 +1,35 @@
+<launch>
+  <arg name="mav_name"       default="firefly" />
+  <arg name="num_agents"     default="2" />
+  <arg name="agent_id"       default="1"/>
+  <arg name="world_frame"    default="world"/>
+  <arg name="agent_frame"    default="state"/>
+  <arg name="launch_prefix"  default=""/>
+
+  <node name="pointcloud_filter_node_$(arg agent_id)" pkg="pointcloud_filter" type="pointcloud_filter_node"  respawn="true" clear_params="true" output="screen" args="$(arg agent_id)">
+    <param name="num_agents"          value="$(arg num_agents)" />
+    <param name="agent_id"            value="$(arg agent_id)" />
+    <param name="world_frame"         value="$(arg world_frame)" />
+    <param name="agent_frame"         value="$(arg agent_frame)" />
+    <param name="ball_radius"         value="2.0" />
+    <param name="pointcloud_topic"    value="$(arg mav_name)_$(arg agent_id)/vi_sensor/camera_depth/depth/points" />
+    
+    <remap from="map_to_world0"  to="/pose_graph_backend/map_to_world0" />
+    <remap from="odom_to_map0"   to="/pose_graph_backend/odom_to_map0" />	
+    <remap from="odometry_0"     to="/$(arg mav_name)_0/msf_core/odometry" />
+
+    <remap from="map_to_world1"  to="/pose_graph_backend/map_to_world1" />
+    <remap from="odom_to_map1"   to="/pose_graph_backend/odom_to_map1" />	
+    <remap from="odometry_1"     to="/$(arg mav_name)_1/msf_core/odometry" />		
+  </node>
+
+  <node name="pcl_fusion_$(arg agent_id)" pkg="pcl_fusion" type="pcl_fusion_node" output="screen">
+    <param name="cam_config" type="string" value="$(find pcl_fusion)/conf/ncamera_sim_visensor.yaml"/> <!-- TODO -->
+    <param name="kf_per_cloud" value="1"/>
+    <param name="voxel_filter_size" value="0.2"/>
+    <param name="num_odom_connections" type="int" value="2"/>
+    <remap from="/pointcloud" to="filtered_pointcloud_$(arg agent_id)" />
+    <remap from="/vins_keyframe" to="/$(arg mav_name)_$(arg agent_id)/pose_graph_$(arg agent_id)/vins_keyframe" />
+  </node>
+  
+</launch>

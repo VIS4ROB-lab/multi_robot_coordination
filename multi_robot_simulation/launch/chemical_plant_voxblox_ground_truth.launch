@@ -1,0 +1,24 @@
+<launch>
+  <param name="/voxblox_ground_truth/voxel_size" value="0.2"/>
+  <!-- Save the ground truth voxblox map with:
+       rosservice call /gazebo/save_voxblox_ground_truth_to_file "file_path: '/home/you/ground_truth_map_name.tsdf'"-->
+
+  <arg name="show_gazebo" default="false"/>
+
+  <!-- Launch Gazebo world -->
+  <group>
+    <!-- Add the sample_data/gazebo models and resources to gazebo path -->
+    <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find voxblox_ground_truth)/sample_data/gazebo/models"/>
+    <env name="GAZEBO_RESOURCE_PATH" value="${GAZEBO_RESOURCE_PATH}:$(find voxblox_ground_truth)/sample_data/gazebo/models"/>
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(find multi_robot_simulation)/worlds/chemical-plant_ground_truth.world"/>
+      <!--<arg name="debug" value="true"/>-->
+      <!--<arg name="paused" value="true"/>-->
+      <arg name="gui" value="$(arg show_gazebo)"/>
+    </include>
+  </group>
+
+  <arg name="rviz_file" default="$(find voxblox_ground_truth)/config/debug_gazebo_plugin.rviz" />
+  <node pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" args="-d $(arg rviz_file)" output="screen"/>
+</launch>

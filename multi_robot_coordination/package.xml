@@ -1,0 +1,20 @@
+<package>
+  <name>multi_robot_coordination</name>
+  <version>1.0.0</version>
+  <description>
+  	Coordinator for multi-robot teams based on a server-agent architecture.
+	</description>
+	
+  <maintainer email="lbartolomei@ethz.ch">Luca Bartolomei</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>multi_robot_simulation</run_depend>
+  <run_depend>multi_robot_global_planner</run_depend>
+  <run_depend>agent_local_planner</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

@@ -1,0 +1,15 @@
+<launch>
+
+<arg name="params_file" default="$(find multi_robot_simulation)/cfg/parameters.yaml"/>
+
+<!-- Run the tf spawner -->
+<node name="odometry_transform_publisher" pkg="multi_robot_simulation" type="odometry_transform_publisher_node" respawn="false" clear_params="true" output="screen">
+   <rosparam file="$(arg params_file)"/>
+</node>
+
+<!-- Run the pointcloud interceptor -->
+<node name="pointcloud_transformator" pkg="multi_robot_simulation" type="pointcloud_transformator_node" respawn="false" clear_params="true" output="screen">
+    <rosparam file="$(arg params_file)"/>
+</node>
+
+</launch>

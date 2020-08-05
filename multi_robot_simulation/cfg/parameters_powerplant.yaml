@@ -1,0 +1,31 @@
+num_agents: 3
+world_frame: "world"
+odom_frame: "odom"
+agent_frame: "agent"
+
+agent_0:
+  namespace: "firefly_0"
+  position: [60.0, 17.0, 0.0]
+  yaw: 0.0 # deg
+  random_walk_mean_pos: 0.0
+  random_walk_cov_pos: 0.0003 # 0.00003
+  random_walk_mean_ang: 0.0
+  random_walk_cov_ang: 0.000075
+
+agent_1:
+  namespace: "firefly_1"
+  position: [52.5, 17.0, 0.0]
+  yaw: 0.0 # deg
+  random_walk_mean_pos: 0.0
+  random_walk_cov_pos: 0.00003
+  random_walk_mean_ang: 0.0
+  random_walk_cov_ang: 0.000075
+
+agent_2:
+  namespace: "firefly_2"
+  position: [20.0, 17.0, 0.0]
+  yaw: 0.0 # deg
+  random_walk_mean_pos: 0.0
+  random_walk_cov_pos: 0.00003
+  random_walk_mean_ang: 0.0
+  random_walk_cov_ang: 0.000075

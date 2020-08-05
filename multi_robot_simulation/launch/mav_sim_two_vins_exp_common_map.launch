@@ -1,0 +1,133 @@
+<launch>
+
+    <!-- Start Gazebo, spawn MAV -->
+    <arg name="mav_name" default="firefly"/>
+    <arg name="mav_name_0" default="firefly_0"/>
+    <arg name="mav_name_1" default="firefly_1"/>
+    <arg name="enable_logging" default="false"/>
+    <arg name="enable_ground_truth" default="true"/>
+    <arg name="log_file" default="$(arg mav_name)"/>
+    <arg name="run_gazebo_gui" default="false"/>
+    <arg name="world" default="chemical-plant"/> <!-- vins_test -->
+    
+    <arg name="x_0" default="0.0"/>
+    <arg name="y_0" default="16.0"/>
+    <arg name="z_0" default="0.3"/>
+    
+    <arg name="x_1" default="-26.0"/>
+    <arg name="y_1" default="-31.0"/>
+    <arg name="z_1" default="0.3"/>
+    
+    <arg name="x_ctrl_0" default="0.0"/>
+    <arg name="y_ctrl_0" default="0.0"/>
+    <arg name="z_ctrl_0" default="1.0"/>
+    <arg name="yaw_ctrl_0" default="0.0"/>
+    
+    <arg name="x_ctrl_1" default="0.0"/>
+    <arg name="y_ctrl_1" default="0.0"/>
+    <arg name="z_ctrl_1" default="1.0"/>
+    <arg name="yaw_ctrl_1" default="0.0"/>
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find multi_robot_simulation)/worlds/$(arg world).world"/>
+        <arg name="paused" value="false" />
+        <arg name="gui" value="$(arg run_gazebo_gui)" />
+    </include>
+
+    <group ns="$(arg mav_name_0)">
+        <include file="$(find rotors_gazebo)/launch/spawn_mav.launch">
+            <arg name="mav_name" value="$(arg mav_name)" />
+            <arg name="namespace" value="$(arg mav_name_0)" />
+            <arg name="model" value="$(find multi_robot_simulation)/descriptions/$(arg mav_name)_base_gps.xacro" />
+            <arg name="enable_logging" value="$(arg enable_logging)" />
+            <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+            <arg name="log_file" value="$(arg log_file)"/>
+            <arg name="x" value="$(arg x_0)"/>
+            <arg name="y" value="$(arg y_0)"/>
+            <arg name="z" value="$(arg z_0)"/>
+        </include>
+        
+        <!-- Start controller -->
+        <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node" respawn="true" clear_params="true" output="screen">
+            <remap from="odometry" to="odometry" />
+            <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml" />
+            <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+            <param name="use_rc_teleop" value="false"/>
+            <param name="verbose" value="false" />
+            <param name="reference_frame" value="odom_fake_0"/>
+        </node>
+
+        <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
+            <remap from="odometry" to="ground_truth/odometry" />
+            <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
+        </node>
+        
+        <node name="hovering_example" pkg="rotors_gazebo" type="hovering_example" output="screen">
+        		<param name="x" value="$(arg x_ctrl_0)"/>
+            <param name="y" value="$(arg y_ctrl_0)"/>
+            <param name="z" value="$(arg z_ctrl_0)"/>
+            <param name="yaw" value="$(arg yaw_ctrl_0)"/>
+        </node>
+
+        <node pkg="tf" type="static_transform_publisher" name="agent0_vi_broadcaster"
+              args="0.116 0.055 -0.025 -0.524 0.524 -0.474 0.474 imu_0 $(arg mav_name_0)/vi_sensor/camera_depth_optical_center_link 100" />
+         
+        <!-- Uncomment to have complete tf tree     
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /> 
+        -->              
+    </group>
+    
+    <group ns="$(arg mav_name_1)">
+        <include file="$(find rotors_gazebo)/launch/spawn_mav.launch">
+            <arg name="mav_name" value="$(arg mav_name)" />
+            <arg name="namespace" value="$(arg mav_name_1)" />
+            <arg name="model" value="$(find multi_robot_simulation)/descriptions/$(arg mav_name)_base_gps.xacro" />
+            <arg name="enable_logging" value="$(arg enable_logging)" />
+            <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+            <arg name="log_file" value="$(arg log_file)"/>
+            <arg name="x" value="$(arg x_1)"/>
+            <arg name="y" value="$(arg y_1)"/>
+            <arg name="z" value="$(arg z_1)"/>
+        </include>
+
+        <!-- Start controller -->
+        <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node" respawn="true" clear_params="true" output="screen">
+            <remap from="odometry" to="odometry" />
+            <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml" />
+            <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+            <param name="use_rc_teleop" value="false"/>
+            <param name="verbose" value="false" />
+            <param name="reference_frame" value="odom_1"/>
+        </node>
+
+        <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
+            <remap from="odometry" to="ground_truth/odometry" />
+            <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
+        </node>
+        
+        <node name="initial_hovering" pkg="rotors_gazebo" type="hovering_example" output="screen">
+        		<param name="x" value="$(arg x_ctrl_1)"/>
+            <param name="y" value="$(arg y_ctrl_1)"/>
+            <param name="z" value="$(arg z_ctrl_1)"/>
+            <param name="yaw" value="$(arg yaw_ctrl_1)"/>
+        </node>
+        
+        <node pkg="tf" type="static_transform_publisher" name="visensor_$(arg mav_name_1)"
+							args="0.116 0.055 -0.025 -0.524 0.524 -0.474 0.474 state_1 $(arg mav_name_1)/vi_sensor/camera_depth_optical_center_link 100" />
+         
+        <!-- Uncomment to have complete tf tree     
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /> 
+        -->              
+    </group>
+
+    <!-- Include simulated backend for controller purposes -->
+    <node name="odometry_transform_publisher" pkg="multi_robot_simulation" type="odometry_transform_publisher_node" respawn="false" clear_params="true" output="screen">
+        <rosparam file="$(find multi_robot_simulation)/cfg/parameters_vins_exp_common_map.yaml"/>
+    </node>
+    
+    <!-- Start RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find multi_robot_simulation)/rviz/simulation_vins.rviz"/>
+
+</launch>

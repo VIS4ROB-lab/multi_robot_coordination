@@ -1,0 +1,66 @@
+<launch>
+    <arg name="agent_id" default = "0"/>
+    <arg name="config_path" default = "$(find multi_robot_simulation)/cfg/vins_sim_agent_$(arg agent_id).yaml" />
+    <arg name="vins_path" default = "$(find feature_tracker)/../config/../" />
+    
+    <group ns="firefly_$(arg agent_id)">
+        <node name="feature_tracker_$(arg agent_id)" pkg="feature_tracker" type="feature_tracker" output="log">
+            <param name="config_file" type="string" value="$(arg config_path)" />
+            <param name="vins_folder" type="string" value="$(arg vins_path)" />
+        </node>
+
+        <node name="vins_estimator_$(arg agent_id)" pkg="vins_estimator" type="vins_estimator" output="screen">
+           <param name="config_file" type="string" value="$(arg config_path)" />
+           <param name="vins_folder" type="string" value="$(arg vins_path)" />
+           <param name="origin_frame_name" type="string" value="odom_$(arg agent_id)" />
+           <param name="camera_frame_name" type="string" value="cam_$(arg agent_id)" />
+           <param name="imu_frame_name" type="string" value="imu_$(arg agent_id)" />
+
+           <remap from="vins_estimator_$(arg agent_id)/features" to="feature_tracker_$(arg agent_id)/feature" />
+           <remap from="vins_estimator_$(arg agent_id)/feature_restart" to="feature_tracker_$(arg agent_id)/restart" />
+        </node>
+
+        <node name="pose_graph_$(arg agent_id)" pkg="pose_graph" type="pose_graph" output="screen">
+            <param name="config_file" type="string" value="$(arg config_path)" />
+            <param name="visualization_shift_x" type="int" value="0" />
+            <param name="visualization_shift_y" type="int" value="0" />
+            <param name="skip_cnt" type="int" value="0" />
+            <param name="skip_dis" type="double" value="0" />
+            <param name="num_odom_connections" type="int" value="2"/>
+
+            <remap from="pose_graph_$(arg agent_id)/keyframe_pose" to="vins_estimator_$(arg agent_id)/keyframe_pose" />
+            <remap from="pose_graph_$(arg agent_id)/keyframe_point" to="vins_estimator_$(arg agent_id)/keyframe_point" />
+        </node>
+    
+        <node name="pose_sensor_vins_$(arg agent_id)" pkg="msf_updates" type="pose_sensor" respawn="true" clear_params="true" output="screen">
+          <remap from="msf_updates/transform_input" to="vins_estimator_$(arg agent_id)/transform" /> 
+          <remap from="msf_core/imu_state_input" to="raw_imu" />
+          <rosparam file="$(find multi_robot_simulation)/cfg/firefly_msf.yaml"/>
+      
+          <param name="core/msf_output_frame" value="odom_$(arg agent_id)"/>
+          <param name="core/msf_state_frame" value="state_$(arg agent_id)"/>
+        </node>
+        
+        <node name="gps_interceptor_node" pkg="multi_robot_simulation" type="gps_interceptor_node" respawn="true" clear_params="true" output="screen" args="$(arg agent_id)">
+          <remap from="gps" to="fix"/> 
+        </node>
+    
+    </group>
+    
+    <node name="vins_initializer_node_$(arg agent_id)" pkg="multi_robot_simulation" type="vins_initializer_node" output="screen" args="$(arg agent_id)">
+        <param name="n_sec_wait"      value="5.0"/>
+        <param name="hovering_height" value="1.4"/>
+        <param name="delta_d"         value="0.5"/>
+        <param name="delta_h"         value="0.3"/>
+        <param name="delta_yaw"       value="10.0"/> <!-- [deg] -->
+        <param name="v_max"           value="0.5"/>
+        <param name="a_max"           value="1.0"/>
+        <param name="v_max_yaw"       value="0.5"/>
+        <param name="a_max_yaw"       value="0.5"/>
+        <param name="sampling_dt"     value="0.10"/>
+        
+        <remap from="odometry_$(arg agent_id)" to="/firefly_$(arg agent_id)/odometry"/>
+        <remap from="command/trajectory"       to="/firefly_$(arg agent_id)/command/trajectory"/>
+    </node>    
+
+</launch>

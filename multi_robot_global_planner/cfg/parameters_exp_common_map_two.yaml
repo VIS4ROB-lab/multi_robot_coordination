@@ -1,0 +1,77 @@
+################################################################################
+############################## PLANNER PARAMETERS ##############################
+################################################################################
+planning_strategy: 2 # 0: One by one, 1: One shot, 2: Constrained One by One
+# Note: the custom sampler for the constrained one by one strategy works only
+# with prm*
+timer_dt: 3.0
+clock_replanning: -30.0 # set to negative value not to force replanning
+num_seconds_to_plan: 15.0
+
+# Reference frames
+world_frame: "world"
+map_frame: "map"
+odometry_frame: "odom"
+agent_frame: "state"
+
+# Robot radius
+robot_radius_0: 0.35
+robot_radius_1: 0.35
+safety_factor: 2.5
+
+# Velocities and accelerations
+v_max: 0.75                   # [m/s]
+a_max: 0.5                    # [m/s^2]
+v_yaw_max: 0.5                # [rad/s] --> not used for ramp interpolator
+a_yaw_max: 0.5                # [rad/s^2] --> not used for ramp interpolator
+sampling_dt: 0.5              # [s] Sampling time for trajectory to send to the controller
+
+# Visualization
+scale_factor_visualization: 5.0
+
+################################################################################
+################################ OMPL PARAMETERS ###############################
+################################################################################
+planner_type: 1 # 0: RRT Connect, 1: RRT*, 2: Info-RRT*, 3: BIT, 4: PRM*
+planning_height: 1.50
+bounding_box_inflation: 0.10
+optimistic: true
+
+use_distance_threshold: true
+distance_threshold: 1.30
+optimization_objective: 0 # 0: Default, 1: Altitude
+interpolator: 1 # 0: Polynomial, 1: Ramp (default: Polynomial)
+
+altitude_obj_params/alpha: 1.0
+altitude_obj_params/beta: 10.0
+
+# Post processing
+simplify_solution: true
+trust_approx_solution: false
+
+# Checks if goal has been reached
+goal_threshold: 0.35 # In simulation try to reach the goal "exactly"
+
+# Miscellanoeus
+visualize: true
+verbose_planner: true
+
+################################################################################
+############################## VOXBLOX PARAMETERS ##############################
+################################################################################
+lower_bound_x: -45.0
+lower_bound_y: -63.0
+lower_bound_z: -2.0
+upper_bound_x: 14.0
+upper_bound_y: 63.0
+upper_bound_z: 4.0
+
+tsdf_voxels_per_side: 16
+slice_level: 1.0
+
+update_mesh_every_n_sec: 0.0
+
+publish_traversable: true
+split_at_collisions: 0.5
+optimize_time: true
+verbose: false

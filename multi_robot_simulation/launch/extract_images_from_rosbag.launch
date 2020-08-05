@@ -1,0 +1,10 @@
+<launch>
+  <!-- Images are stored in ~/.ros -->
+  <arg name="bag_file" default="/home/luca/workspaces/arche_ws/src/multi_robot_planning/data/exp_common_map_two/chemical_plant_sim_two_exp_common_map_2019-09-11-11-32-09.bag"/>
+
+  <node pkg="rosbag" type="play" name="rosbag" required="true" args="$(arg bag_file) -r 20"/>
+  <node name="extract" pkg="image_view" type="extract_images" respawn="false" required="true" output="screen" cwd="ROS_HOME">
+    <remap from="image" to="/firefly_0/feature_tracker_0/feature_img"/>
+  </node>
+  
+</launch>
