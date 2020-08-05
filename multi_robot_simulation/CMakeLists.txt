@@ -4,10 +4,7 @@ project(multi_robot_simulation)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
-find_package(PCL REQUIRED COMPONENTS common filters)
-
 add_definitions(-std=c++11)
-include_directories(include ${PCL_INCLUDE_DIRS})
 
 #############
 # LIBRARIES #
@@ -26,7 +23,14 @@ cs_add_library(pointcloud_transformator
 )
 target_link_libraries(pointcloud_transformator
     ${CATKIN_LIBRARIES}
-    ${PCL_LIBRARIES}
+)
+
+# Pointcloud filter
+cs_add_library(pointcloud_filter 
+    src/pointcloud_filter.cpp
+)
+target_link_libraries(pointcloud_filter 
+    ${catkin_LIBRARIES}
 )
 
 # VINS initializer
@@ -70,6 +74,14 @@ cs_add_executable(pointcloud_transformator_node
 )
 target_link_libraries(pointcloud_transformator_node
     pointcloud_transformator
+)
+
+# Pointcloud filter
+cs_add_executable(pointcloud_filter_node 
+    src/pointcloud_filter_node.cpp
+)
+target_link_libraries(pointcloud_filter_node 
+    pointcloud_filter
 )
 
 # VINS initializer

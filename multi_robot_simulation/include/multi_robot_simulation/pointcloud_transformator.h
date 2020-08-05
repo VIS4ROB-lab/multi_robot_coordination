@@ -17,7 +17,8 @@
 namespace mrp {
 
 class PointcloudTransformator {
- public:
+
+public:
   typedef sensor_msgs::PointCloud2 PointcloudROS;
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointcloudPCL;
 
@@ -34,7 +35,7 @@ class PointcloudTransformator {
    */
   ~PointcloudTransformator() {}
 
- private:
+private:
   /**
    * @brief Read the parameters from the server
    * @return True if all parameters were parsed correctly, false otherwise
@@ -60,7 +61,7 @@ class PointcloudTransformator {
   void pointcloudCallback(const sensor_msgs::PointCloud2ConstPtr &pcl_msg,
                           const uint64_t agent_id);
 
- protected:
+protected:
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
 
@@ -78,6 +79,6 @@ class PointcloudTransformator {
 
   std::vector<std::string> agents_ns_;
 
-};  // end class PointcloudTransformator
+}; // end class PointcloudTransformator
 
-}  // end namespace mrp
+} // end namespace mrp
