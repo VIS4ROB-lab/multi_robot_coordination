@@ -8,12 +8,14 @@
 namespace mrp {
 
 PolynomialInterpolator::PolynomialInterpolator(const DynamicParams &params)
-    : v_max_(params.v_max), a_max_(params.a_max), v_yaw_max_(params.v_yaw_max),
-      a_yaw_max_(params.a_yaw_max), sampling_dt_(params.sampling_dt) {}
+    : v_max_(params.v_max),
+      a_max_(params.a_max),
+      v_yaw_max_(params.v_yaw_max),
+      a_yaw_max_(params.a_yaw_max),
+      sampling_dt_(params.sampling_dt) {}
 
 bool PolynomialInterpolator::interpolate(const GlobalPath &path,
                                          GlobalPath *interpolated_path) {
-
   // Clear output container
   interpolated_path->clear();
 
@@ -85,8 +87,7 @@ bool PolynomialInterpolator::interpolate(const GlobalPath &path,
     if (segment_times_yaw[i] > segment_times[i])
       segment_times[i] = segment_times_yaw[i];
 
-    if (segment_times[i] < sampling_dt_)
-      segment_times[i] = sampling_dt_;
+    if (segment_times[i] < sampling_dt_) segment_times[i] = sampling_dt_;
   }
 
   const int N = 10;
@@ -139,7 +140,6 @@ void PolynomialInterpolator::updateParameters(const double v_max,
 void PolynomialInterpolator::createYawsFromStates(
     const mav_msgs::EigenTrajectoryPoint::Vector &states,
     std::vector<double> &yaws) {
-
   // Assure that the output vector is empty
   yaws.clear();
   yaws.resize(states.size(), 0.0);
@@ -154,4 +154,4 @@ void PolynomialInterpolator::createYawsFromStates(
   yaws.back() = yaws[yaws.size() - 2];
 }
 
-} // end namespace mrp
+}  // end namespace mrp

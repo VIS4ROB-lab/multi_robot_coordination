@@ -12,13 +12,13 @@
 #include <mav_msgs/eigen_mav_msgs.h>
 #include <ros/ros.h>
 
-#include "multi_robot_global_planner/ompl/mav_setup.h"
 #include "multi_robot_global_planner/interpolators/polynomial_interpolator.h"
+#include "multi_robot_global_planner/ompl/mav_setup.h"
 
 namespace mrp {
 
 class VoxbloxOmplRrt {
-public:
+ public:
   VoxbloxOmplRrt(const ros::NodeHandle &nh, const ros::NodeHandle &nh_private);
   VoxbloxOmplRrt(const ros::NodeHandle &nh, const ros::NodeHandle &nh_private,
                  const int num_agents);
@@ -46,28 +46,27 @@ public:
   RrtPlannerType getPlanner() const { return params_.planner_type; }
   void setPlanner(RrtPlannerType planner) { params_.planner_type = planner; }
 
-  void setConstraintPaths(const
-              std::vector<std::vector<Eigen::Vector3d> >& constraint_paths);
+  void setConstraintPaths(
+      const std::vector<std::vector<Eigen::Vector3d> > &constraint_paths);
 
   // Only call this once, only call this after setting all settings correctly.
   void setupMultiAgentProblem(const int num_agents);
-  void setupProblem(const Eigen::Vector3d &start,
-                    const Eigen::Vector3d &goal,
+  void setupProblem(const Eigen::Vector3d &start, const Eigen::Vector3d &goal,
                     const bool constrained_planning = false);
   void setupReturnHomeProblem(const Eigen::Vector3d &start,
-                    const Eigen::Vector3d &goal,
-                    const bool constrained_planning = false);
+                              const Eigen::Vector3d &goal,
+                              const bool constrained_planning = false);
 
   // Fixed start and end locations, returns list of waypoints between.
-  bool
-  getPathBetweenWaypoints(const mav_msgs::EigenTrajectoryPoint &start,
-                          const mav_msgs::EigenTrajectoryPoint &goal,
-                          mav_msgs::EigenTrajectoryPoint::Vector *solution);
+  bool getPathBetweenWaypoints(
+      const mav_msgs::EigenTrajectoryPoint &start,
+      const mav_msgs::EigenTrajectoryPoint &goal,
+      mav_msgs::EigenTrajectoryPoint::Vector *solution);
 
   bool getBestPathTowardGoalMultiAgent(
-          const mav_msgs::EigenTrajectoryPointVector &start,
-          const mav_msgs::EigenTrajectoryPointVector &goal,
-          std::vector<mav_msgs::EigenTrajectoryPoint::Vector> &solution);
+      const mav_msgs::EigenTrajectoryPointVector &start,
+      const mav_msgs::EigenTrajectoryPointVector &goal,
+      std::vector<mav_msgs::EigenTrajectoryPoint::Vector> &solution);
 
   void solutionPathToTrajectoryPoints(
       ompl::geometric::PathGeometric &path,
@@ -93,17 +92,17 @@ public:
                          std::vector<Eigen::Vector3d> &path) const;
 
   bool validConstrainedStraightLine(
-            const Eigen::Vector3d &start, const Eigen::Vector3d &goal,
-            const int n_step, std::vector<std::vector<Eigen::Vector3d> > &con_path,
-            std::vector<Eigen::Vector3d> &out_path) const;
+      const Eigen::Vector3d &start, const Eigen::Vector3d &goal,
+      const int n_step, std::vector<std::vector<Eigen::Vector3d> > &con_path,
+      std::vector<Eigen::Vector3d> &out_path) const;
 
-protected:
+ protected:
   void setupFromStartAndGoal(const mav_msgs::EigenTrajectoryPoint &start,
                              const mav_msgs::EigenTrajectoryPoint &goal);
 
   void setupMultiAgentFromStartAndGoal(
-          const mav_msgs::EigenTrajectoryPointVector &starts,
-          const mav_msgs::EigenTrajectoryPointVector &goals);
+      const mav_msgs::EigenTrajectoryPointVector &starts,
+      const mav_msgs::EigenTrajectoryPointVector &goals);
 
   double getDistanceEigenToState(const Eigen::Vector3d &eigen,
                                  const ompl::base::State *state_ptr);
@@ -136,4 +135,4 @@ protected:
   double robot_radius_;
 };
 
-} // namespace mrp
+}  // namespace mrp

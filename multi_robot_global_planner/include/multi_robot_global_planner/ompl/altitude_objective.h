@@ -19,7 +19,7 @@ namespace ompl {
 namespace mrp {
 
 class AltitudeObjective : public ompl::base::StateCostIntegralObjective {
-public:
+ public:
   AltitudeObjective(const ompl::base::SpaceInformationPtr &si, const double h)
       : constant_height(h), ompl::base::StateCostIntegralObjective(si, true) {}
 
@@ -29,14 +29,14 @@ public:
 
   double altitude_deviation(const ompl::base::State *s) const {
     const Eigen::Vector3d robot_state = omplRToEigen(s);
-    double z = robot_state(2); // access the z-coordinate of
+    double z = robot_state(2);  // access the z-coordinate of
     // current state s
     return std::sqrt(std::pow(z - constant_height, 2));
   }
 
-private:
+ private:
   double constant_height;
 };
 
-} // end namespace mrp
-} // end namespace ompl
+}  // end namespace mrp
+}  // end namespace ompl

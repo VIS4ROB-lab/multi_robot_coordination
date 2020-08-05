@@ -14,7 +14,7 @@
 namespace mrp {
 
 class PolynomialInterpolator {
-public:
+ public:
   PolynomialInterpolator(const DynamicParams &params);
   virtual ~PolynomialInterpolator() {}
 
@@ -24,12 +24,12 @@ public:
                         const double v_yaw_max, const double a_yaw_max,
                         const double sampling_dt);
 
-private:
-  void
-  createYawsFromStates(const mav_msgs::EigenTrajectoryPoint::Vector &states,
-                       std::vector<double> &yaws);
+ private:
+  void createYawsFromStates(
+      const mav_msgs::EigenTrajectoryPoint::Vector &states,
+      std::vector<double> &yaws);
 
-protected:
+ protected:
   double v_max_;
   double a_max_;
   double v_yaw_max_;
@@ -37,4 +37,4 @@ protected:
   double sampling_dt_;
 };
 
-} // end namespace mrp
+}  // end namespace mrp

@@ -27,7 +27,7 @@ namespace mrp {
 
 // Setup class for a geometric planning problem with R3 state space.
 class MavSetup : public geometric::SimpleSetup {
-public:
+ public:
   MavSetup()
       : geometric::SimpleSetup(base::StateSpacePtr(new RStateSpace(3))) {}
 
@@ -50,8 +50,9 @@ public:
   // consiting of path length and altitude
   // Params w1, w2 : given by alpha, beta in launch file
   // Param h: altitude/height of MAV when planning begins (via service call)
-  ompl::base::OptimizationObjectivePtr
-  getBalancedObjective(const double h, const double w1, const double w2) {
+  ompl::base::OptimizationObjectivePtr getBalancedObjective(const double h,
+                                                            const double w1,
+                                                            const double w2) {
     ompl::base::OptimizationObjectivePtr lengthObj(
         new ompl::base::PathLengthOptimizationObjective(getSpaceInformation()));
     ompl::base::OptimizationObjectivePtr altitudeObj(
@@ -98,8 +99,7 @@ public:
 
   void setLenghtOptimizationObjective(const double distance) {
     ompl::base::OptimizationObjectivePtr obj(
-            new ompl::base::PathLengthOptimizationObjective(
-                    getSpaceInformation()));
+        new ompl::base::PathLengthOptimizationObjective(getSpaceInformation()));
     obj->setCostThreshold(ompl::base::Cost(distance));
     getProblemDefinition()->setOptimizationObjective(obj);
   }
@@ -117,22 +117,18 @@ public:
   }
 
   void setTsdfVoxbloxCollisionCheckingHierarchical(
-          double robot_radius, double safety_factor,
-          std::vector<std::vector<Eigen::Vector3d> > &check_paths,
-          voxblox::Layer<voxblox::TsdfVoxel> *tsdf_layer) {
-
+      double robot_radius, double safety_factor,
+      std::vector<std::vector<Eigen::Vector3d> > &check_paths,
+      voxblox::Layer<voxblox::TsdfVoxel> *tsdf_layer) {
     std::shared_ptr<TsdfVoxbloxValidityCheckerHierarchicalMultiAgent>
-            validity_checker(
-            new TsdfVoxbloxValidityCheckerHierarchicalMultiAgent(
-                    getSpaceInformation(), robot_radius, safety_factor,
-                    check_paths, tsdf_layer));
+        validity_checker(new TsdfVoxbloxValidityCheckerHierarchicalMultiAgent(
+            getSpaceInformation(), robot_radius, safety_factor, check_paths,
+            tsdf_layer));
 
     setStateValidityChecker(base::StateValidityCheckerPtr(validity_checker));
-    si_->setMotionValidator(
-            base::MotionValidatorPtr(
-                    new VoxbloxMotionValidatorHierarchicalMultiAgent<
-                            voxblox::TsdfVoxel>(
-                            getSpaceInformation(), validity_checker)));
+    si_->setMotionValidator(base::MotionValidatorPtr(
+        new VoxbloxMotionValidatorHierarchicalMultiAgent<voxblox::TsdfVoxel>(
+            getSpaceInformation(), validity_checker)));
   }
 
   void setEsdfVoxbloxCollisionChecking(
@@ -148,21 +144,18 @@ public:
   }
 
   void setEsdfVoxbloxCollisionCheckingHierarchical(
-          double robot_radius, double safety_factor,
-          std::vector<std::vector<Eigen::Vector3d> > &check_paths,
-          voxblox::Layer<voxblox::EsdfVoxel> *esdf_layer) {
+      double robot_radius, double safety_factor,
+      std::vector<std::vector<Eigen::Vector3d> > &check_paths,
+      voxblox::Layer<voxblox::EsdfVoxel> *esdf_layer) {
     std::shared_ptr<EsdfVoxbloxValidityCheckerHierarchicalMultiAgent>
-            validity_checker(
-            new EsdfVoxbloxValidityCheckerHierarchicalMultiAgent(
-                    getSpaceInformation(), robot_radius, safety_factor,
-                    check_paths, esdf_layer));
+        validity_checker(new EsdfVoxbloxValidityCheckerHierarchicalMultiAgent(
+            getSpaceInformation(), robot_radius, safety_factor, check_paths,
+            esdf_layer));
 
     setStateValidityChecker(base::StateValidityCheckerPtr(validity_checker));
-    si_->setMotionValidator(
-            base::MotionValidatorPtr(
-                    new VoxbloxMotionValidatorHierarchicalMultiAgent<
-                            voxblox::EsdfVoxel>(
-                            getSpaceInformation(), validity_checker)));
+    si_->setMotionValidator(base::MotionValidatorPtr(
+        new VoxbloxMotionValidatorHierarchicalMultiAgent<voxblox::EsdfVoxel>(
+            getSpaceInformation(), validity_checker)));
   }
 
   void constructPrmRoadmap(double num_seconds_to_construct) {
@@ -174,20 +167,20 @@ public:
   }
 
   static base::ValidStateSamplerPtr allocMultiAgentStateSampler(
-          const base::SpaceInformation  *si,
-          const double robot_radius, const double safety_factor,
-          std::vector<std::vector<Eigen::Vector3d> > &constraint_paths) {
-    std::shared_ptr<MultiAgentSampler> sampler(new
-                   ompl::mrp::MultiAgentSampler(si, robot_radius,
-                           safety_factor, constraint_paths));
+      const base::SpaceInformation *si, const double robot_radius,
+      const double safety_factor,
+      std::vector<std::vector<Eigen::Vector3d> > &constraint_paths) {
+    std::shared_ptr<MultiAgentSampler> sampler(new ompl::mrp::MultiAgentSampler(
+        si, robot_radius, safety_factor, constraint_paths));
     return sampler;
   }
 
-  void setMultiAgentSampler(const double robot_radius,
-                const double safety_factor,
-                std::vector<std::vector<Eigen::Vector3d> > &constraint_paths) {
+  void setMultiAgentSampler(
+      const double robot_radius, const double safety_factor,
+      std::vector<std::vector<Eigen::Vector3d> > &constraint_paths) {
     std::function<ompl::base::ValidStateSamplerPtr(
-            const ompl::base::SpaceInformation*)> sampler_allocator =
+        const ompl::base::SpaceInformation *)>
+        sampler_allocator =
             std::bind(&ompl::mrp::MavSetup::allocMultiAgentStateSampler,
                       std::placeholders::_1, robot_radius, safety_factor,
                       constraint_paths);
@@ -246,20 +239,20 @@ public:
       try_more = psk_->reduceVertices(path);
     }
   }
-}; // end class MavSetup
+};  // end class MavSetup
 
 /**
  * @brief Class for setting up multi-robot problem
  */
 class MultiMavSetup : public geometric::SimpleSetup {
-public:
+ public:
   MultiMavSetup(const int num_agents = 1)
-    : geometric::SimpleSetup(base::StateSpacePtr(
-            new base::CompoundStateSpace())),
-      num_agents_(num_agents) {
+      : geometric::SimpleSetup(
+            base::StateSpacePtr(new base::CompoundStateSpace())),
+        num_agents_(num_agents) {
     for (unsigned int i = 0; i < num_agents; ++i) {
       si_->getStateSpace()->as<ompl::base::CompoundStateSpace>()->addSubspace(
-              std::make_shared<ompl::mrp::RStateSpace>(3), 1.0);
+          std::make_shared<ompl::mrp::RStateSpace>(3), 1.0);
     }
   }
 
@@ -268,36 +261,36 @@ public:
   // Get some defaults.
   void setDefaultObjective() {
     getProblemDefinition()->setOptimizationObjective(
-            ompl::base::OptimizationObjectivePtr(
-                    new ompl::base::PathLengthOptimizationObjective(
-                            getSpaceInformation())));
+        ompl::base::OptimizationObjectivePtr(
+            new ompl::base::PathLengthOptimizationObjective(
+                getSpaceInformation())));
   }
 
   void setDefaultPlanner() { setRrtStar(); }
 
   void setRrtStar() {
     setPlanner(ompl::base::PlannerPtr(
-            new ompl::geometric::RRTstar(getSpaceInformation())));
+        new ompl::geometric::RRTstar(getSpaceInformation())));
   }
 
   void setRrtConnect() {
     setPlanner(ompl::base::PlannerPtr(
-            new ompl::geometric::RRTConnect(getSpaceInformation())));
+        new ompl::geometric::RRTConnect(getSpaceInformation())));
   }
 
   void setInformedRrtStar() {
     setPlanner(ompl::base::PlannerPtr(
-            new ompl::geometric::InformedRRTstar(getSpaceInformation())));
+        new ompl::geometric::InformedRRTstar(getSpaceInformation())));
   }
 
   void setBitStar() {
     setPlanner(ompl::base::PlannerPtr(
-            new ompl::geometric::BITstar(getSpaceInformation())));
+        new ompl::geometric::BITstar(getSpaceInformation())));
   }
 
   void setPrm() {
     setPlanner(ompl::base::PlannerPtr(
-            new ompl::geometric::PRM(getSpaceInformation())));
+        new ompl::geometric::PRM(getSpaceInformation())));
   }
 
   const base::StateSpacePtr &getGeometricComponentStateSpace() const {
@@ -311,49 +304,43 @@ public:
 
   void setLenghtOptimizationObjective(const double distance) {
     ompl::base::OptimizationObjectivePtr obj(
-            new ompl::base::PathLengthOptimizationObjective(
-                    getSpaceInformation()));
+        new ompl::base::PathLengthOptimizationObjective(getSpaceInformation()));
     obj->setCostThreshold(ompl::base::Cost(distance));
     getProblemDefinition()->setOptimizationObjective(obj);
   }
 
   void setTsdfVoxbloxCollisionCheckingCompoundState(
-          double robot_radius, double safety_factor,
-          voxblox::Layer<voxblox::TsdfVoxel> *tsdf_layer) {
-
+      double robot_radius, double safety_factor,
+      voxblox::Layer<voxblox::TsdfVoxel> *tsdf_layer) {
     std::shared_ptr<TsdfVoxbloxValidityCheckerMultiAgentCompoundState>
-            validity_checker(
-            new TsdfVoxbloxValidityCheckerMultiAgentCompoundState(
-                    getSpaceInformation(), robot_radius, safety_factor,
-                    num_agents_, tsdf_layer));
+        validity_checker(new TsdfVoxbloxValidityCheckerMultiAgentCompoundState(
+            getSpaceInformation(), robot_radius, safety_factor, num_agents_,
+            tsdf_layer));
 
     setStateValidityChecker(base::StateValidityCheckerPtr(validity_checker));
-    si_->setMotionValidator(
-            base::MotionValidatorPtr(
-                    new VoxbloxMotionValidatorMultiAgentCompoundState<
-                            voxblox::TsdfVoxel>(
-                            getSpaceInformation(), validity_checker)));
+    si_->setMotionValidator(base::MotionValidatorPtr(
+        new VoxbloxMotionValidatorMultiAgentCompoundState<voxblox::TsdfVoxel>(
+            getSpaceInformation(), validity_checker)));
   }
 
   void setEsdfVoxbloxCollisionChecking(
-          double robot_radius, voxblox::Layer<voxblox::EsdfVoxel> *esdf_layer) {
+      double robot_radius, voxblox::Layer<voxblox::EsdfVoxel> *esdf_layer) {
     std::shared_ptr<EsdfVoxbloxValidityChecker> validity_checker(
-            new EsdfVoxbloxValidityChecker(getSpaceInformation(), robot_radius,
-                                           esdf_layer));
+        new EsdfVoxbloxValidityChecker(getSpaceInformation(), robot_radius,
+                                       esdf_layer));
 
     setStateValidityChecker(base::StateValidityCheckerPtr(validity_checker));
     si_->setMotionValidator(
-            base::MotionValidatorPtr(
-                    new VoxbloxMotionValidator<voxblox::EsdfVoxel>(
-                    getSpaceInformation(), validity_checker)));
+        base::MotionValidatorPtr(new VoxbloxMotionValidator<voxblox::EsdfVoxel>(
+            getSpaceInformation(), validity_checker)));
   }
 
   void constructPrmRoadmap(double num_seconds_to_construct) {
     base::PlannerTerminationCondition ptc =
-            base::timedPlannerTerminationCondition(num_seconds_to_construct);
+        base::timedPlannerTerminationCondition(num_seconds_to_construct);
 
     std::dynamic_pointer_cast<ompl::geometric::PRM>(getPlanner())
-            ->constructRoadmap(ptc);
+        ->constructRoadmap(ptc);
   }
 
   void reduceVertices() {
@@ -362,16 +349,16 @@ public:
       if (p) {
         time::point start = time::now();
         geometric::PathGeometric &path =
-                static_cast<geometric::PathGeometric &>(*p);
+            static_cast<geometric::PathGeometric &>(*p);
         std::size_t num_states = path.getStateCount();
 
         reduceVerticesOfPath(path);
         // simplifyTime_ member of the parent class.
         simplifyTime_ = time::seconds(time::now() - start);
         OMPL_INFORM(
-                "MavSetup: Vertex reduction took %f seconds and changed from %d to "
-                "%d states",
-                simplifyTime_, num_states, path.getStateCount());
+            "MavSetup: Vertex reduction took %f seconds and changed from %d to "
+            "%d states",
+            simplifyTime_, num_states, path.getStateCount());
         return;
       }
     }
@@ -382,7 +369,7 @@ public:
   void reduceVerticesOfPath(geometric::PathGeometric &path) {
     const double max_time = 0.1;
     base::PlannerTerminationCondition ptc =
-            base::timedPlannerTerminationCondition(max_time);
+        base::timedPlannerTerminationCondition(max_time);
 
     // Now just call near-vertex collapsing and reduceVertices.
     if (path.getStateCount() < 3) {
@@ -407,9 +394,9 @@ public:
     }
   }
 
-protected:
+ protected:
   int num_agents_;
-}; // end class MultiMavSetup
+};  // end class MultiMavSetup
 
-} // namespace mrp
-} // namespace ompl
+}  // namespace mrp
+}  // namespace ompl

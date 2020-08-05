@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <Eigen/Core>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
+#include <Eigen/Core>
 
 namespace ompl {
 namespace mrp {
@@ -37,5 +37,5 @@ inline Eigen::Vector3d omplSE2ToEigen(const base::State *state) {
   return eigen_state;
 }
 
-} // end namespace mrp
-} // end namespace ompl
+}  // end namespace mrp
+}  // end namespace ompl

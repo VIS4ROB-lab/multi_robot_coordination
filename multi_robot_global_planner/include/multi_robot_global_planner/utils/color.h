@@ -9,7 +9,7 @@ namespace mrp {
  * @brief Class to quickly decide the color to use
  */
 class Color : public std_msgs::ColorRGBA {
-public:
+ public:
   Color() : std_msgs::ColorRGBA() {}
   Color(double red, double green, double blue) : Color(red, green, blue, 1.0) {}
   Color(double red, double green, double blue, double alpha) : Color() {
@@ -33,4 +33,4 @@ public:
   static const Color Pink() { return Color(1.0, 0.0, 0.5); }
 };
 
-} // end namespace mrp
+}  // end namespace mrp

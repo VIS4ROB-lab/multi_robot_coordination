@@ -4,14 +4,18 @@ namespace mrp {
 
 VoxbloxOmplRrt::VoxbloxOmplRrt(const ros::NodeHandle &nh,
                                const ros::NodeHandle &nh_private)
-    : nh_(nh), nh_private_(nh_private), optimistic_(true),
+    : nh_(nh),
+      nh_private_(nh_private),
+      optimistic_(true),
       lower_bound_(Eigen::Vector3d::Zero()),
       upper_bound_(Eigen::Vector3d::Zero()) {}
 
 VoxbloxOmplRrt::VoxbloxOmplRrt(const ros::NodeHandle &nh,
                                const ros::NodeHandle &nh_private,
                                const int num_agents)
-    : nh_(nh), nh_private_(nh_private), optimistic_(true),
+    : nh_(nh),
+      nh_private_(nh_private),
+      optimistic_(true),
       lower_bound_(Eigen::Vector3d::Zero()),
       upper_bound_(Eigen::Vector3d::Zero()),
       multi_agent_problem_setup_(num_agents) {}
@@ -36,8 +40,8 @@ void VoxbloxOmplRrt::setEsdfLayer(
   voxel_size_ = esdf_layer_->voxel_size();
 }
 
-void VoxbloxOmplRrt::setConstraintPaths(const
-           std::vector<std::vector<Eigen::Vector3d> >& constraint_paths) {
+void VoxbloxOmplRrt::setConstraintPaths(
+    const std::vector<std::vector<Eigen::Vector3d> > &constraint_paths) {
   constraint_paths_ = constraint_paths;
 }
 
@@ -46,32 +50,30 @@ void VoxbloxOmplRrt::setupProblem(const Eigen::Vector3d &start,
                                   const bool constrained_planning) {
   if (optimistic_) {
     CHECK_NOTNULL(tsdf_layer_);
-    if(constrained_planning) {
+    if (constrained_planning) {
       problem_setup_.setTsdfVoxbloxCollisionCheckingHierarchical(
-              robot_radius_, params_.safety_factor, constraint_paths_,
-              tsdf_layer_);
+          robot_radius_, params_.safety_factor, constraint_paths_, tsdf_layer_);
     } else {
       problem_setup_.setTsdfVoxbloxCollisionChecking(robot_radius_,
                                                      tsdf_layer_);
     }
   } else {
     CHECK_NOTNULL(esdf_layer_);
-    problem_setup_.setEsdfVoxbloxCollisionChecking(robot_radius_,
-                                                   esdf_layer_);
+    problem_setup_.setEsdfVoxbloxCollisionChecking(robot_radius_, esdf_layer_);
   }
 
   if (params_.optimization_objective == OptimizationObjective::kDefault) {
     if (!params_.use_distance_threshold) {
       problem_setup_.setDefaultObjective();
     } else {
-      problem_setup_.setLenghtOptimizationObjective(
-              params_.distance_threshold * (goal - start).norm());
+      problem_setup_.setLenghtOptimizationObjective(params_.distance_threshold *
+                                                    (goal - start).norm());
     }
-  } else if(params_.optimization_objective ==
-               OptimizationObjective::kAltitude) {
+  } else if (params_.optimization_objective ==
+             OptimizationObjective::kAltitude) {
     problem_setup_.setConstantAltitudeObjective(
-            start.z(), params_.altitude_obj_params.alpha,
-            params_.altitude_obj_params.beta);
+        start.z(), params_.altitude_obj_params.alpha,
+        params_.altitude_obj_params.beta);
   }
 
   if (params_.planner_type == kRrtConnect) {
@@ -122,19 +124,17 @@ void VoxbloxOmplRrt::setupReturnHomeProblem(const Eigen::Vector3d &start,
   if (constrained_planning) {
     CHECK_NOTNULL(esdf_layer_);
     problem_setup_.setEsdfVoxbloxCollisionCheckingHierarchical(
-            robot_radius_, params_.safety_factor, constraint_paths_,
-            esdf_layer_);
+        robot_radius_, params_.safety_factor, constraint_paths_, esdf_layer_);
   } else {
     CHECK_NOTNULL(esdf_layer_);
-    problem_setup_.setEsdfVoxbloxCollisionChecking(robot_radius_,
-                                                   esdf_layer_);
+    problem_setup_.setEsdfVoxbloxCollisionChecking(robot_radius_, esdf_layer_);
   }
 
   if (!params_.use_distance_threshold) {
     problem_setup_.setDefaultObjective();
   } else {
-    problem_setup_.setLenghtOptimizationObjective(
-            params_.distance_threshold * (goal - start).norm());
+    problem_setup_.setLenghtOptimizationObjective(params_.distance_threshold *
+                                                  (goal - start).norm());
   }
 
   if (params_.planner_type == kRrtConnect) {
@@ -163,8 +163,8 @@ void VoxbloxOmplRrt::setupReturnHomeProblem(const Eigen::Vector3d &start,
 
     // Define start and goal positions.
     problem_setup_.getGeometricComponentStateSpace()
-            ->as<ompl::mrp::RStateSpace>()
-            ->setBounds(bounds);
+        ->as<ompl::mrp::RStateSpace>()
+        ->setBounds(bounds);
   }
 
   // This is a fraction of the space extent! Not actual metric units. For
@@ -173,22 +173,21 @@ void VoxbloxOmplRrt::setupReturnHomeProblem(const Eigen::Vector3d &start,
   if ((upper_bound_ - lower_bound_).norm() > 1e-3) {
     // If bounds are set, set this to approximately one voxel.
     validity_checking_resolution =
-            voxel_size_ / (upper_bound_ - lower_bound_).norm() / 2.0;
+        voxel_size_ / (upper_bound_ - lower_bound_).norm() / 2.0;
   }
   problem_setup_.setStateValidityCheckingResolution(
-          validity_checking_resolution);
+      validity_checking_resolution);
 }
 
 void VoxbloxOmplRrt::setupMultiAgentProblem(const int num_agents) {
-
   if (optimistic_) {
     CHECK_NOTNULL(tsdf_layer_);
     multi_agent_problem_setup_.setTsdfVoxbloxCollisionCheckingCompoundState(
-             robot_radius_, params_.safety_factor, tsdf_layer_);
+        robot_radius_, params_.safety_factor, tsdf_layer_);
   } else {
     CHECK_NOTNULL(esdf_layer_);
-    multi_agent_problem_setup_.setEsdfVoxbloxCollisionChecking(
-            robot_radius_, esdf_layer_);
+    multi_agent_problem_setup_.setEsdfVoxbloxCollisionChecking(robot_radius_,
+                                                               esdf_layer_);
   }
 
   multi_agent_problem_setup_.setDefaultObjective();
@@ -217,10 +216,11 @@ void VoxbloxOmplRrt::setupMultiAgentProblem(const int num_agents) {
     bounds.setHigh(2, upper_bound_.z());
 
     // Define start and goal positions.
-    for(size_t id = 0; id < num_agents; ++id) {
+    for (size_t id = 0; id < num_agents; ++id) {
       multi_agent_problem_setup_.getGeometricComponentStateSpace()
-              ->as<ompl::base::CompoundStateSpace>()
-              ->as<ompl::mrp::RStateSpace>(id)->setBounds(bounds);
+          ->as<ompl::base::CompoundStateSpace>()
+          ->as<ompl::mrp::RStateSpace>(id)
+          ->setBounds(bounds);
     }
   }
 
@@ -230,10 +230,10 @@ void VoxbloxOmplRrt::setupMultiAgentProblem(const int num_agents) {
   if ((upper_bound_ - lower_bound_).norm() > 1e-3) {
     // If bounds are set, set this to approximately one voxel.
     validity_checking_resolution =
-            voxel_size_ / (upper_bound_ - lower_bound_).norm() / 2.0;
+        voxel_size_ / (upper_bound_ - lower_bound_).norm() / 2.0;
   }
   multi_agent_problem_setup_.setStateValidityCheckingResolution(
-          validity_checking_resolution);
+      validity_checking_resolution);
 }
 
 bool VoxbloxOmplRrt::getPathBetweenWaypoints(
@@ -298,18 +298,18 @@ void VoxbloxOmplRrt::setupFromStartAndGoal(
 }
 
 void VoxbloxOmplRrt::setupMultiAgentFromStartAndGoal(
-        const mav_msgs::EigenTrajectoryPointVector &starts,
-        const mav_msgs::EigenTrajectoryPointVector &goals) {
+    const mav_msgs::EigenTrajectoryPointVector &starts,
+    const mav_msgs::EigenTrajectoryPointVector &goals) {
   // Get the number of agents we have here
   size_t num_agents = starts.size();
 
   // Now create the problem for multiple agents
   ompl::base::ScopedState<ompl::base::CompoundStateSpace> start_ompl(
-          multi_agent_problem_setup_.getSpaceInformation());
+      multi_agent_problem_setup_.getSpaceInformation());
   ompl::base::ScopedState<ompl::base::CompoundStateSpace> goal_ompl(
-          multi_agent_problem_setup_.getSpaceInformation());
+      multi_agent_problem_setup_.getSpaceInformation());
 
-  for(size_t id = 0; id < num_agents; ++id) {
+  for (size_t id = 0; id < num_agents; ++id) {
     auto *startId = start_ompl->as<ompl::mrp::RStateSpace::StateType>(id);
     startId->values[0] = starts[id].position_W.x();
     startId->values[1] = starts[id].position_W.y();
@@ -321,8 +321,8 @@ void VoxbloxOmplRrt::setupMultiAgentFromStartAndGoal(
     goalId->values[2] = goals[id].position_W.z();
   }
 
-  multi_agent_problem_setup_.setStartAndGoalStates(
-          start_ompl, goal_ompl, voxel_size_);
+  multi_agent_problem_setup_.setStartAndGoalStates(start_ompl, goal_ompl,
+                                                   voxel_size_);
   multi_agent_problem_setup_.setup();
 }
 
@@ -444,9 +444,9 @@ bool VoxbloxOmplRrt::getBestPathTowardGoal(
 }
 
 bool VoxbloxOmplRrt::getBestPathTowardGoalMultiAgent(
-        const mav_msgs::EigenTrajectoryPointVector &start,
-        const mav_msgs::EigenTrajectoryPointVector &goal,
-        std::vector<mav_msgs::EigenTrajectoryPoint::Vector> &solutions) {
+    const mav_msgs::EigenTrajectoryPointVector &start,
+    const mav_msgs::EigenTrajectoryPointVector &goal,
+    std::vector<mav_msgs::EigenTrajectoryPoint::Vector> &solutions) {
   uint64_t num_agents = start.size();
 
   solutions.clear();
@@ -454,8 +454,8 @@ bool VoxbloxOmplRrt::getBestPathTowardGoalMultiAgent(
   setupMultiAgentFromStartAndGoal(start, goal);
 
   // Solvin' time!
-  bool solution_found =  multi_agent_problem_setup_.solve(
-          params_.num_seconds_to_plan);
+  bool solution_found =
+      multi_agent_problem_setup_.solve(params_.num_seconds_to_plan);
   if (solution_found) {
     if (multi_agent_problem_setup_.haveExactSolutionPath()) {
       // Simplify and print.
@@ -467,18 +467,20 @@ bool VoxbloxOmplRrt::getBestPathTowardGoalMultiAgent(
       }
 
       std::vector<ompl::base::State *> &state_vector =
-              multi_agent_problem_setup_.getSolutionPath().getStates() ;
+          multi_agent_problem_setup_.getSolutionPath().getStates();
       for (ompl::base::State *state_ptr : state_vector) {
-
-        for(size_t id = 0; id < num_agents; ++id) {
+        for (size_t id = 0; id < num_agents; ++id) {
           mav_msgs::EigenTrajectoryPoint mav_position;
-          mav_position.position_W = Eigen::Vector3d(
-              state_ptr->as<ompl::base::CompoundState>()
-                       ->as<ompl::mrp::RStateSpace::StateType>(id)->values[0],
-              state_ptr->as<ompl::base::CompoundState>()
-                       ->as<ompl::mrp::RStateSpace::StateType>(id)->values[1],
-              state_ptr->as<ompl::base::CompoundState>()
-                       ->as<ompl::mrp::RStateSpace::StateType>(id)->values[2]);
+          mav_position.position_W =
+              Eigen::Vector3d(state_ptr->as<ompl::base::CompoundState>()
+                                  ->as<ompl::mrp::RStateSpace::StateType>(id)
+                                  ->values[0],
+                              state_ptr->as<ompl::base::CompoundState>()
+                                  ->as<ompl::mrp::RStateSpace::StateType>(id)
+                                  ->values[1],
+                              state_ptr->as<ompl::base::CompoundState>()
+                                  ->as<ompl::mrp::RStateSpace::StateType>(id)
+                                  ->values[2]);
           solutions[id].push_back(mav_position);
         }
       }
@@ -491,9 +493,8 @@ bool VoxbloxOmplRrt::getBestPathTowardGoalMultiAgent(
   return false;
 }
 
-double
-VoxbloxOmplRrt::getDistanceEigenToState(const Eigen::Vector3d &eigen,
-                                        const ompl::base::State *state_ptr) {
+double VoxbloxOmplRrt::getDistanceEigenToState(
+    const Eigen::Vector3d &eigen, const ompl::base::State *state_ptr) {
   Eigen::Vector3d state_pos(
       state_ptr->as<ompl::mrp::RStateSpace::StateType>()->values[0],
       state_ptr->as<ompl::mrp::RStateSpace::StateType>()->values[1],
@@ -502,11 +503,9 @@ VoxbloxOmplRrt::getDistanceEigenToState(const Eigen::Vector3d &eigen,
   return (eigen - state_pos).norm();
 }
 
-bool VoxbloxOmplRrt::validStraightLine(const Eigen::Vector3d &start,
-                                       const Eigen::Vector3d &goal,
-                                       const int n_step,
-                                       std::vector<Eigen::Vector3d> &path)
-                                       const {
+bool VoxbloxOmplRrt::validStraightLine(
+    const Eigen::Vector3d &start, const Eigen::Vector3d &goal, const int n_step,
+    std::vector<Eigen::Vector3d> &path) const {
   double delta_x = (goal(0) - start(0)) / static_cast<double>(n_step);
   double delta_y = (goal(1) - start(1)) / static_cast<double>(n_step);
   double delta_z = (goal(2) - start(2)) / static_cast<double>(n_step);
@@ -519,8 +518,8 @@ bool VoxbloxOmplRrt::validStraightLine(const Eigen::Vector3d &start,
     voxblox::Point robot_point =
         (start + delta_position).cast<voxblox::FloatingPoint>();
     voxblox::HierarchicalIndexMap block_voxel_list;
-    voxblox::utils::getSphereAroundPoint(
-        *tsdf_layer_, robot_point, robot_radius_, &block_voxel_list);
+    voxblox::utils::getSphereAroundPoint(*tsdf_layer_, robot_point,
+                                         robot_radius_, &block_voxel_list);
 
     for (const std::pair<voxblox::BlockIndex, voxblox::VoxelIndexList> &kv :
          block_voxel_list) {
@@ -555,24 +554,24 @@ bool VoxbloxOmplRrt::validStraightLine(const Eigen::Vector3d &start,
 }
 
 bool VoxbloxOmplRrt::validConstrainedStraightLine(
-        const Eigen::Vector3d &start, const Eigen::Vector3d &goal,
-        const int n_step, std::vector<std::vector<Eigen::Vector3d> > &con_path,
-        std::vector<Eigen::Vector3d> &out_path) const {
+    const Eigen::Vector3d &start, const Eigen::Vector3d &goal, const int n_step,
+    std::vector<std::vector<Eigen::Vector3d> > &con_path,
+    std::vector<Eigen::Vector3d> &out_path) const {
   // Try straight line connection first. If this is not feasible already, it
   // does not make sense that we cross check with the paths of the other agents
-  if(!validStraightLine(start, goal, n_step, out_path)) {
+  if (!validStraightLine(start, goal, n_step, out_path)) {
     return false;
   }
 
   // Now do the cross - checking
   double min_clearance = params_.safety_factor * robot_radius_;
-  for(int id = 0; id < con_path.size(); ++id) {
-    for(std::vector<Eigen::Vector3d>::iterator con_it = con_path[id].begin();
-        con_it != con_path[id].end(); ++con_it) {
-        // Iterate over the found solution
-      for(std::vector<Eigen::Vector3d>::iterator out_it = out_path.begin();
-          out_it != out_path.end(); ++out_it) {
-        if((*con_it - *out_it).norm() < min_clearance) {
+  for (int id = 0; id < con_path.size(); ++id) {
+    for (std::vector<Eigen::Vector3d>::iterator con_it = con_path[id].begin();
+         con_it != con_path[id].end(); ++con_it) {
+      // Iterate over the found solution
+      for (std::vector<Eigen::Vector3d>::iterator out_it = out_path.begin();
+           out_it != out_path.end(); ++out_it) {
+        if ((*con_it - *out_it).norm() < min_clearance) {
           return false;
         }
       }
@@ -581,4 +580,4 @@ bool VoxbloxOmplRrt::validConstrainedStraightLine(
   return true;
 }
 
-} // namespace mrp
+}  // namespace mrp

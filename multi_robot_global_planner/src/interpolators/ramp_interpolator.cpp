@@ -13,7 +13,6 @@ RampInterpolator::RampInterpolator(const double v_max, const double a_max,
 
 bool RampInterpolator::interpolate(const GlobalPath &path,
                                    GlobalPath *interpolated_path) {
-
   // Initialize variables
   double time = 0.0;
   double velocity = 0.0;
@@ -129,4 +128,4 @@ void RampInterpolator::updateParameters(const double v_max, const double a_max,
   sampling_dt_ = sampling_dt;
 }
 
-} // namespace mrp
+}  // namespace mrp
