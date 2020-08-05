@@ -7,8 +7,8 @@
 
 #include <random>
 
-#include <Eigen/Eigen>
 #include <tf_conversions/tf_eigen.h>
+#include <Eigen/Eigen>
 
 namespace mrp {
 
@@ -27,7 +27,6 @@ OdometryTransformPublisher::OdometryTransformPublisher(
 OdometryTransformPublisher::~OdometryTransformPublisher() {}
 
 bool OdometryTransformPublisher::readParameters() {
-
   // Read how many sources
   bool load_success = nh_private_.getParam("num_agents", num_agents_);
   CHECK(load_success) << "Failed to load the number of agents.";
@@ -68,7 +67,7 @@ bool OdometryTransformPublisher::readParameters() {
     const std::string odom_orient_name = agent_name + "/yaw";
     double input_orient;
     load_success &= nh_private_.getParam(odom_orient_name, input_orient);
-    input_orient *= M_PI / 180.0; // to radiants
+    input_orient *= M_PI / 180.0;  // to radiants
     CHECK(load_success) << "Failed to read odom frame orientation for agent "
                         << id;
 
@@ -187,13 +186,11 @@ void OdometryTransformPublisher::odometryCallback(
   odom_to_world_transforms_[agent_id] = odom_to_world_noisy_;
 
   // Get the transformation world to odom for agent id
-  tf::quaternionTFToEigen(odom_to_world_noisy_.getRotation(),
-                          quaternion_eigen);
+  tf::quaternionTFToEigen(odom_to_world_noisy_.getRotation(), quaternion_eigen);
   Eigen::Matrix4d T_w_o;
-  T_w_o.block(0, 3, 3, 1)
-      << odom_to_world_noisy_.getOrigin().getX(),
-         odom_to_world_noisy_.getOrigin().getY(),
-         odom_to_world_noisy_.getOrigin().getZ();
+  T_w_o.block(0, 3, 3, 1) << odom_to_world_noisy_.getOrigin().getX(),
+      odom_to_world_noisy_.getOrigin().getY(),
+      odom_to_world_noisy_.getOrigin().getZ();
   T_w_o.block(0, 0, 3, 3) << quaternion_eigen.normalized().toRotationMatrix();
   T_w_o.block(3, 0, 1, 4) << 0.0, 0.0, 0.0, 1.0;
 
@@ -214,15 +211,15 @@ void OdometryTransformPublisher::odometryCallback(
   transform_o_a.setRotation(quaternion_o_a);
 
   ROS_INFO_ONCE("Published first transformation");
-  tf_broadcaster_.sendTransform(tf::StampedTransform(
-      transform_o_a, ros::Time::now(),
-      odom_frame_ + "_" + std::to_string(agent_id),
-      agent_frame_ + "_" + std::to_string(agent_id)));
+  tf_broadcaster_.sendTransform(
+      tf::StampedTransform(transform_o_a, ros::Time::now(),
+                           odom_frame_ + "_" + std::to_string(agent_id),
+                           agent_frame_ + "_" + std::to_string(agent_id)));
 
   // Publish the transformation world to odom
-  tf_broadcaster_.sendTransform(tf::StampedTransform(
-      odom_to_world_noisy_, ros::Time::now(), world_frame_,
-      odom_frame_ + "_" + std::to_string(agent_id)));
+  tf_broadcaster_.sendTransform(
+      tf::StampedTransform(odom_to_world_noisy_, ros::Time::now(), world_frame_,
+                           odom_frame_ + "_" + std::to_string(agent_id)));
 
   // Publish odometry message odom to agent
   nav_msgs::Odometry odometry_msg_o_a;
@@ -247,13 +244,13 @@ void OdometryTransformPublisher::odometryCallback(
                                   odom_msg->twist.twist.linear.y,
                                   odom_msg->twist.twist.linear.z);
   Eigen::Vector3d angular_velocity(odom_msg->twist.twist.angular.x,
-                                  odom_msg->twist.twist.angular.y,
-                                  odom_msg->twist.twist.angular.z);
+                                   odom_msg->twist.twist.angular.y,
+                                   odom_msg->twist.twist.angular.z);
 
-  Eigen::Vector3d transformed_lin_vel(
-          T_w_o.block(0, 0, 3, 3).transpose() * linear_velocity);
-  Eigen::Vector3d transformed_ang_vel(
-          T_w_o.block(0, 0, 3, 3).transpose() * angular_velocity);
+  Eigen::Vector3d transformed_lin_vel(T_w_o.block(0, 0, 3, 3).transpose() *
+                                      linear_velocity);
+  Eigen::Vector3d transformed_ang_vel(T_w_o.block(0, 0, 3, 3).transpose() *
+                                      angular_velocity);
 
   odometry_msg_o_a.twist.twist.linear.x = transformed_lin_vel.x();
   odometry_msg_o_a.twist.twist.linear.y = transformed_lin_vel.y();
@@ -267,4 +264,4 @@ void OdometryTransformPublisher::odometryCallback(
   odometry_pubs_[agent_id].publish(odometry_msg_o_a);
 }
 
-} // end namespace mrp
+}  // end namespace mrp

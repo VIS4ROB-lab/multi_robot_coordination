@@ -7,7 +7,6 @@
 #include "multi_robot_simulation/gps_pose_graph_initializer.h"
 
 int main(int argc, char *argv[]) {
-
   // Get the agent id
   if (argc < 2) {
     ROS_ERROR("[GPS Initializer] Could not initialize, missing agent id!");

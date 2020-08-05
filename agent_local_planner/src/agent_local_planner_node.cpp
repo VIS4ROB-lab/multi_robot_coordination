@@ -7,7 +7,6 @@
 #include "agent_local_planner/agent_local_planner.h"
 
 int main(int argc, char *argv[]) {
-
   google::InitGoogleLogging(argv[0]);
   ros::init(argc, argv, "agent_local_planner");
   ros::NodeHandle nh("");

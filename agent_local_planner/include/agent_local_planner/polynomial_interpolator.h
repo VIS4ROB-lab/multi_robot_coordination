@@ -14,26 +14,26 @@ namespace mrp {
 typedef std::vector<Eigen::VectorXd> LocalPath;
 
 class PolynomialInterpolator {
-public:
+ public:
   PolynomialInterpolator(const double v_max, const double a_max,
                          const double v_yaw_max, const double a_yaw_max,
                          const double sampling_dt);
   virtual ~PolynomialInterpolator() {}
 
-  bool interpolate(const LocalPath &path, LocalPath *interpolated_path,
-                   const Eigen::Vector3d &initial_velocity =
-                           Eigen::Vector3d::Zero());
+  bool interpolate(
+      const LocalPath &path, LocalPath *interpolated_path,
+      const Eigen::Vector3d &initial_velocity = Eigen::Vector3d::Zero());
 
   void updateParameters(const double v_max, const double a_max,
                         const double v_yaw_max, const double a_yaw_max,
                         const double sampling_dt);
 
-private:
-  void
-  createYawsFromStates(const mav_msgs::EigenTrajectoryPoint::Vector &states,
-                       std::vector<double> &yaws);
+ private:
+  void createYawsFromStates(
+      const mav_msgs::EigenTrajectoryPoint::Vector &states,
+      std::vector<double> &yaws);
 
-protected:
+ protected:
   double v_max_;
   double a_max_;
   double v_yaw_max_;
@@ -41,4 +41,4 @@ protected:
   double sampling_dt_;
 };
 
-} // end namespace mrp
+}  // end namespace mrp

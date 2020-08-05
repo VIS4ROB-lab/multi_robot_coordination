@@ -32,8 +32,7 @@
 namespace mrp {
 
 class AgentLocalPlanner {
-
-public:
+ public:
   /**
    * @brief Class constructor
    * @param[in] nh : ROS node handle
@@ -47,7 +46,7 @@ public:
    */
   ~AgentLocalPlanner();
 
-private:
+ private:
   /**
    * @brief Method that initializes the ROS communication
    */
@@ -65,9 +64,9 @@ private:
   bool stopServiceCallback(std_srvs::Empty::Request &req,
                            std_srvs::Empty::Response &res);
 
-  void plannerTimerCallback(const ros::TimerEvent& e);
+  void plannerTimerCallback(const ros::TimerEvent &e);
 
-  void commandPublishTimerCallback(const ros::TimerEvent& event);
+  void commandPublishTimerCallback(const ros::TimerEvent &event);
 
   /**
    * @brief Method to send a stop command to the MPC. It resets the local
@@ -88,8 +87,8 @@ private:
    * s                                pline
    * @return True if a valid command was found, False otherwise
    */
-  bool getTrajectoryPoint(double t,
-          mav_msgs::EigenTrajectoryPoint& command_trajectory) const;
+  bool getTrajectoryPoint(
+      double t, mav_msgs::EigenTrajectoryPoint &command_trajectory) const;
 
   /**
    * @brief Method to update the transformation from odometry to drifted
@@ -123,7 +122,7 @@ private:
    */
   std_msgs::ColorRGBA percentToColor(double h) const;
 
-protected:
+ protected:
   // ROS variables
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
@@ -151,14 +150,14 @@ protected:
   ros::AsyncSpinner command_publishing_spinner_;
 
   tf::TransformListener tf_listener_;
-  Eigen::Matrix4d T_w_o_;      // Transformation world to odom when global
-                               // path is received
+  Eigen::Matrix4d T_w_o_;  // Transformation world to odom when global
+                           // path is received
   Eigen::Matrix4d T_odrifted_o_;
 
   // Check variables
   bool map_initialized_;
   bool got_global_path_;
-  bool stopped_; // Variable when the local planner receives an hard stop
+  bool stopped_;  // Variable when the local planner receives an hard stop
 
   // Parameters
   int agent_id_;
@@ -217,6 +216,6 @@ protected:
   // Debug
   std::ofstream log_file_;
 
-}; // end class AgentLocalPlanner
+};  // end class AgentLocalPlanner
 
-} // end namespace mrp
+}  // end namespace mrp

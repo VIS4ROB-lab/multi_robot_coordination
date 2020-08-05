@@ -5,22 +5,22 @@
 
 #include "multi_robot_simulation/vins_initializer.h"
 
-#include <trajectory_msgs/MultiDOFJointTrajectory.h>
 #include <mav_msgs/default_topics.h>
 #include <mav_trajectory_generation/polynomial_optimization_linear.h>
 #include <mav_trajectory_generation/trajectory_sampling.h>
+#include <trajectory_msgs/MultiDOFJointTrajectory.h>
 
 namespace mrp {
 
 VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
                                  const ros::NodeHandle &nh_private,
                                  const int agent_id)
-    : nh_(nh), nh_private_(nh_private), has_odometry_(false),
+    : nh_(nh),
+      nh_private_(nh_private),
+      has_odometry_(false),
       agent_id_(agent_id) {
-
   // Get parameters
-  std::string ns(
-          "vins_initializer_node_" + std::to_string(agent_id_) + "/");
+  std::string ns("vins_initializer_node_" + std::to_string(agent_id_) + "/");
 
   double n_sec_wait;
   CHECK(nh_.getParam(ns + "n_sec_wait", n_sec_wait));
@@ -33,35 +33,45 @@ VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
   delta_yaw *= M_PI / 180.0;
 
   double v_max, a_max, v_max_yaw, a_max_yaw, sampling_dt;
-  if(!nh_.getParam(ns + "v_max", v_max)) { v_max = 2.0; }
-  if(!nh_.getParam(ns + "a_max", a_max)) { a_max = 2.0; }
-  if(!nh_.getParam(ns + "v_max_yaw", v_max_yaw)) { v_max = 2.0; }
-  if(!nh_.getParam(ns + "a_max_yaw", a_max_yaw)) { a_max = 2.0; }
-  if(!nh_.getParam(ns + "sampling_dt", sampling_dt)) { sampling_dt = 2.0; }
+  if (!nh_.getParam(ns + "v_max", v_max)) {
+    v_max = 2.0;
+  }
+  if (!nh_.getParam(ns + "a_max", a_max)) {
+    a_max = 2.0;
+  }
+  if (!nh_.getParam(ns + "v_max_yaw", v_max_yaw)) {
+    v_max = 2.0;
+  }
+  if (!nh_.getParam(ns + "a_max_yaw", a_max_yaw)) {
+    a_max = 2.0;
+  }
+  if (!nh_.getParam(ns + "sampling_dt", sampling_dt)) {
+    sampling_dt = 2.0;
+  }
 
   // Set up ros communication
   odom_sub_ = nh_.subscribe("odometry_" + std::to_string(agent_id_), 10,
-          &mrp::VinsInitializer::odometryCallback, this);
+                            &mrp::VinsInitializer::odometryCallback, this);
   trajectory_cmd_pub_ = nh_.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
-          mav_msgs::default_topics::COMMAND_TRAJECTORY, 100);
+      mav_msgs::default_topics::COMMAND_TRAJECTORY, 100);
 
   // Wait until you get odometry
   ros::Duration(n_sec_wait).sleep();
-  while(!has_odometry_) {
+  while (!has_odometry_) {
     ros::Duration(0.5).sleep();
     ros::spinOnce();
   }
   ROS_INFO_STREAM("[Vins Initializer] Ready to initialize agent " << agent_id_);
 
   // Waypoints for initialization in ground truth frame (plus, landing)
-  std::vector<Eigen::Vector3d> waypoints(8,
-          Eigen::Vector3d(odometry_.position_W.x(), odometry_.position_W.y(),
-                          hovering_height));
+  std::vector<Eigen::Vector3d> waypoints(
+      8, Eigen::Vector3d(odometry_.position_W.x(), odometry_.position_W.y(),
+                         hovering_height));
 
   waypoints[1] += Eigen::Vector3d(delta_d, 0.0, delta_h);
   waypoints[2] += Eigen::Vector3d(-delta_d, 0.0, -delta_h);
-  waypoints[4] += Eigen::Vector3d(delta_d/3.0, delta_d, delta_h);
-  waypoints[6] += Eigen::Vector3d(-delta_d/3.0, -delta_d, -delta_h);
+  waypoints[4] += Eigen::Vector3d(delta_d / 3.0, delta_d, delta_h);
+  waypoints[6] += Eigen::Vector3d(-delta_d / 3.0, -delta_d, -delta_h);
 
   std::vector<double> yaws(8, odometry_.getYaw());
   yaws[1] -= delta_yaw;
@@ -73,9 +83,9 @@ VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
   mav_trajectory_generation::Vertex::Vector vertices, vertices_yaw;
   const int dimension = 3;
   const int derivative_to_optimize =
-          mav_trajectory_generation::derivative_order::ACCELERATION;
+      mav_trajectory_generation::derivative_order::ACCELERATION;
   const int derivative_to_optimize_yaw =
-          mav_trajectory_generation::derivative_order::ANGULAR_ACCELERATION;
+      mav_trajectory_generation::derivative_order::ANGULAR_ACCELERATION;
 
   mav_trajectory_generation::Vertex vertex(dimension), vertex_yaw(1);
   vertex.makeStartOrEnd(waypoints[0], derivative_to_optimize);
@@ -89,7 +99,7 @@ VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
   for (size_t i = 1; i < waypoints.size() - 1; ++i) {
     mav_trajectory_generation::Vertex vertex_m(dimension), vertex_yaw_m(1);
     vertex_m.addConstraint(
-            mav_trajectory_generation::derivative_order::POSITION, waypoints[i]);
+        mav_trajectory_generation::derivative_order::POSITION, waypoints[i]);
 
     if (std::abs(yaws[i] + 2 * M_PI - yaw_old) < std::abs(yaws[i] - yaw_old)) {
       yaw_old = yaws[i] + 2 * M_PI;
@@ -101,7 +111,7 @@ VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
     }
 
     vertex_yaw_m.addConstraint(
-            mav_trajectory_generation::derivative_order::ORIENTATION, yaw_old);
+        mav_trajectory_generation::derivative_order::ORIENTATION, yaw_old);
     vertices.push_back(vertex_m);
     vertices_yaw.push_back(vertex_yaw_m);
   }
@@ -122,17 +132,16 @@ VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
 
   // Step 3: obtain interpolated trajectory
   std::vector<double> segment_times =
-          mav_trajectory_generation::estimateSegmentTimes(vertices, v_max, a_max);
+      mav_trajectory_generation::estimateSegmentTimes(vertices, v_max, a_max);
   std::vector<double> segment_times_yaw{
-          mav_trajectory_generation::estimateSegmentTimes(vertices_yaw,
-                  v_max_yaw, a_max_yaw)};
+      mav_trajectory_generation::estimateSegmentTimes(vertices_yaw, v_max_yaw,
+                                                      a_max_yaw)};
 
   for (int i = 0; i < segment_times.size(); ++i) {
     if (segment_times_yaw[i] > segment_times[i])
       segment_times[i] = segment_times_yaw[i];
 
-    if (segment_times[i] < sampling_dt)
-      segment_times[i] = sampling_dt;
+    if (segment_times[i] < sampling_dt) segment_times[i] = sampling_dt;
   }
 
   const int N = 10;
@@ -163,7 +172,7 @@ VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
   cmd_trajectory.header.frame_id = frame_id_;
   cmd_trajectory.header.stamp = ros::Time::now();
 
-  for(int i = 0; i < states.size(); ++i) {
+  for (int i = 0; i < states.size(); ++i) {
     trajectory_msgs::MultiDOFJointTrajectoryPoint cmd_point;
     cmd_point.transforms.resize(1);
     cmd_point.transforms[0].translation.x = states[i].position_W.x();
@@ -193,22 +202,24 @@ VinsInitializer::VinsInitializer(const ros::NodeHandle &nh,
     cmd_point.accelerations[0].angular.y = states[i].angular_acceleration_W.y();
     cmd_point.accelerations[0].angular.z = states[i].angular_acceleration_W.z();
 
-    cmd_point.time_from_start = ros::Duration(
-            states[i].time_from_start_ns * 1e-9);
+    cmd_point.time_from_start =
+        ros::Duration(states[i].time_from_start_ns * 1e-9);
 
     cmd_trajectory.points.push_back(cmd_point);
   }
 
   // Publish the controller command
   trajectory_cmd_pub_.publish(cmd_trajectory);
-  ROS_INFO_STREAM("[Vins Initializer] Sent trajectory for initialization of "
-                  "agent " << agent_id_);
+  ROS_INFO_STREAM(
+      "[Vins Initializer] Sent trajectory for initialization of "
+      "agent "
+      << agent_id_);
 }
 
 VinsInitializer::~VinsInitializer() {}
 
 void VinsInitializer::odometryCallback(
-        const nav_msgs::OdometryConstPtr &odom_msg) {
+    const nav_msgs::OdometryConstPtr &odom_msg) {
   ROS_INFO_ONCE("[Vins Initializer] Initialize odometry");
 
   has_odometry_ = true;
@@ -216,4 +227,4 @@ void VinsInitializer::odometryCallback(
   mav_msgs::eigenOdometryFromMsg(*odom_msg, &odometry_);
 }
 
-} // end namespace mrp
+}  // end namespace mrp

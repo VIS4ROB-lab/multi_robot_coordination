@@ -7,16 +7,20 @@
 
 namespace mrp {
 
-PolynomialInterpolator::PolynomialInterpolator(
-        const double v_max, const double a_max,
-        const double v_yaw_max, const double a_yaw_max,
-        const double sampling_dt)
-    : v_max_(v_max), a_max_(a_max), v_yaw_max_(v_yaw_max),
-      a_yaw_max_(a_yaw_max), sampling_dt_(sampling_dt) {}
+PolynomialInterpolator::PolynomialInterpolator(const double v_max,
+                                               const double a_max,
+                                               const double v_yaw_max,
+                                               const double a_yaw_max,
+                                               const double sampling_dt)
+    : v_max_(v_max),
+      a_max_(a_max),
+      v_yaw_max_(v_yaw_max),
+      a_yaw_max_(a_yaw_max),
+      sampling_dt_(sampling_dt) {}
 
-bool PolynomialInterpolator::interpolate(const LocalPath &path,
-        LocalPath *interpolated_path, const Eigen::Vector3d &initial_velocity) {
-
+bool PolynomialInterpolator::interpolate(
+    const LocalPath &path, LocalPath *interpolated_path,
+    const Eigen::Vector3d &initial_velocity) {
   // Clear output container
   interpolated_path->clear();
 
@@ -90,8 +94,7 @@ bool PolynomialInterpolator::interpolate(const LocalPath &path,
     if (segment_times_yaw[i] > segment_times[i])
       segment_times[i] = segment_times_yaw[i];
 
-    if (segment_times[i] < sampling_dt_)
-      segment_times[i] = sampling_dt_;
+    if (segment_times[i] < sampling_dt_) segment_times[i] = sampling_dt_;
   }
 
   const int N = 10;
@@ -123,8 +126,8 @@ bool PolynomialInterpolator::interpolate(const LocalPath &path,
   for (size_t i = 0; i < states.size(); ++i) {
     Eigen::VectorXd point(5);
     point << states[i].position_W(0), states[i].position_W(1),
-             states[i].position_W(2), states[i].getYaw(),
-             states[i].time_from_start_ns;
+        states[i].position_W(2), states[i].getYaw(),
+        states[i].time_from_start_ns;
     interpolated_path->push_back(point);
   }
 
@@ -160,4 +163,4 @@ void PolynomialInterpolator::createYawsFromStates(
   yaws.back() = yaws[yaws.size() - 2];
 }
 
-} // end namespace mrp
+}  // end namespace mrp
