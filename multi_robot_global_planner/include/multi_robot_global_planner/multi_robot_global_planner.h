@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <geodetic_utils/geodetic_conv.hpp>
 #include <glog/logging.h>
-#include <std_srvs/Trigger.h>
 #include <std_msgs/Int16.h>
+#include <std_srvs/Trigger.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <voxblox_ros/esdf_server.h>
+#include <geodetic_utils/geodetic_conv.hpp>
 
 #include "multi_robot_global_planner/interpolators/polynomial_interpolator.h"
 #include "multi_robot_global_planner/interpolators/ramp_interpolator.h"
@@ -27,8 +27,7 @@ namespace mrp {
  * ie agent after the other.
  */
 class MultiRobotGlobalPlanner {
-
-public:
+ public:
   /**
    * @brief Class constructor
    * @param[in] nh : ROS node handle
@@ -49,7 +48,7 @@ public:
    */
   bool readParameters();
 
-private:
+ private:
   /**
    * @brief Method that initializes ROS-related variables and communications
    */
@@ -98,20 +97,20 @@ private:
    * @brief Callback to get the transformation from odometry to map for an
    *        agent.
    * @param[in] transf_msg : the transformation message
-   * @param[in[ agent_id : the id of the agent the transformation belongs to
+   * @param[in] agent_id : the id of the agent the transformation belongs to
    */
   void odomToMapCallback(
-          const geometry_msgs::TransformStampedConstPtr transf_odom_map_msg,
-          const uint64_t agent_id);
+      const geometry_msgs::TransformStampedConstPtr transf_odom_map_msg,
+      const uint64_t agent_id);
 
   /**
    * @brief Callback to get the transformation from map to world for an agent.
    * @param[in] transf_msg : the transformation message
-   * @param[in[ agent_id : the id of the agent the transformation belongs to
+   * @param[in] agent_id : the id of the agent the transformation belongs to
    */
   void mapToWorldCallback(
-          const geometry_msgs::TransformStampedConstPtr transf_map_world_msg,
-          const uint64_t agent_id);
+      const geometry_msgs::TransformStampedConstPtr transf_map_world_msg,
+      const uint64_t agent_id);
 
   /**
    * @brief Callback when the return home behaviour is triggered
@@ -134,7 +133,7 @@ private:
    * @param[in] replan_msg : message containing the id of the agent
    */
   void replanToCurrentWaypointCallback(
-          const std_msgs::Int16ConstPtr &replan_msg);
+      const std_msgs::Int16ConstPtr &replan_msg);
 
   /**
    * @brief Callback for the ROS timer to be executed at fixed time steps
@@ -183,7 +182,7 @@ private:
    * @param[in] agent_id : id of the agent to send home
    */
   void planToHomeConstrainedAgent(const Eigen::Vector4d &agent_pose,
-          const int agent_id);
+                                  const int agent_id);
 
   /**
    * @brief Method to check which paths are in collisions
@@ -194,8 +193,7 @@ private:
    * @return True if at least one of the path is in collision
    */
   bool checkPathsForCollisions(const Eigen::Vector4d &agent_pose,
-          const int agent_id,
-          bool optimistic = true);
+                               const int agent_id, bool optimistic = true);
 
   /**
    * @brief Method to check if the current agent with ID agent_id has a path
@@ -209,7 +207,7 @@ private:
    * @return True if at least one of the path is in collision
    */
   bool checkPathsToHomeForCollisions(const Eigen::Vector4d &agent_pose,
-          const int agent_id) const;
+                                     const int agent_id) const;
 
   /**
    * @brief Method that computes the global path for an agent to the current
@@ -257,7 +255,7 @@ private:
    * @return Distance to the closest obstacle. If the position is in unknown
    *         space, a distance 0.0 is returned
    */
-  double getMapDistance(const Eigen::Vector3d& position) const;
+  double getMapDistance(const Eigen::Vector3d &position) const;
 
   /**
    * @brief Method to get the agent pose in the world frame. First it will
@@ -312,7 +310,7 @@ private:
    * @return The path in GlobalPath format
    */
   GlobalPath getGlobalPathFromEigenVector(
-         const mav_msgs::EigenTrajectoryPoint::Vector &path_eigen_vector) const;
+      const mav_msgs::EigenTrajectoryPoint::Vector &path_eigen_vector) const;
 
   /**
    * @brief Method to transform a path made of positions in std vector format
@@ -322,8 +320,8 @@ private:
    * @return The path in GlobalPath format
    */
   GlobalPath getGlobalPathFromStdVector(
-          const std::vector<Eigen::Vector3d> &path_std_vector,
-          const double start_yaw) const;
+      const std::vector<Eigen::Vector3d> &path_std_vector,
+      const double start_yaw) const;
 
   /**
    * @brief Method to check if the return home behaviour for an agent has
@@ -351,7 +349,7 @@ private:
    */
   void publishMarkerPaths() const;
 
-protected:
+ protected:
   // ROS Variables
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
@@ -414,39 +412,10 @@ protected:
   // Global waypoint lists to be reached for all the agents
   std::vector<WaypointsList> waypoints_lists_;
 
-  // Storage for the global paths of all the agents
+  // Containers for the agents (and the corresponding robot radii)
+  std::vector<Agent> agents_;
   std::vector<double> robot_radii_;
-  std::vector<GlobalPath> global_paths_;
 
-  // Storage for the current waypoint number in the waypoint list. It stores
-  // the current waypoint list index to plan to
-  std::vector<uint64_t> waypoint_nums_;
+};  // end class MultiRobotGlobalPlanner
 
-  // Storage of checks: it tells us if all the agents have valid paths
-  std::vector<bool> valid_paths_;
-  std::vector<bool> reached_all_goals_;
-  std::vector<bool> move_next_waypoint_;
-
-  // Storage for the starting positions of all the agents, in case the return
-  // home is triggered
-  std::vector<Eigen::Vector3d> home_positions_;
-  std::vector<bool> home_triggered_;
-
-  // Storages for the transformations
-  // Reference frame convention for each agent:
-  // - W : world
-  // - M : map
-  // - O : odom
-  // - A : agent
-  // Convention: T_B_A --> from A to B
-  std::vector<Eigen::Matrix4d> T_O_A_; // this is from odometry information
-  std::vector<Eigen::Matrix4d> T_W_M_; // this is from pose graph backend
-  std::vector<Eigen::Matrix4d> T_M_O_; // this is from pose graph backend
-
-  std::vector<bool> transformations_initialized_O_A_;
-  std::vector<bool> transformations_initialized_M_O_;
-  std::vector<bool> transformations_initialized_W_M_;
-
-}; // end class MultiRobotGlobalPlanner
-
-} // end namespace mrp
+}  // end namespace mrp
