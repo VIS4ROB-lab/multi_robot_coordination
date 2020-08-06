@@ -1,13 +1,17 @@
 ################################################################################
 ############################## PLANNER PARAMETERS ##############################
 ################################################################################
-num_agents: 3
+# Available planning strategies:
+# - One by one: plan a global path for all the agents independently and in sequence. This will not consider the collisions amongst agents
+# - One shot: solves the planning problem for all the agents in one shot. This is not optimal and fails quite often, due to the complexity of the problem
+# - Constrained one by one: this is the planning strategy introduced in the paper. It will try to find the paths for all the agents, avoiding collisions with the obstacles and with the other agents
 planning_strategy: 2 # 0: One by one, 1: One shot, 2: Constrained One by One
 # Note: the custom sampler for the constrained one by one strategy works only
 # with prm*
-timer_dt: 3.0
-clock_replanning: -30.0 # set to negative value not to force replanning
-num_seconds_to_plan: 15.0
+
+timer_dt: 3.0             # [s]
+clock_replanning: -30.0   # set to negative value not to force replanning; if positive, a replanning iteration is forced after "clock_replanning" seconds
+num_seconds_to_plan: 15.0 # [s]
 
 # Reference frames
 world_frame: "world"
@@ -16,17 +20,17 @@ odometry_frame: "odom"
 agent_frame: "agent"
 
 # Robot radius
-robot_radius_0: 0.50
-robot_radius_1: 0.50
-robot_radius_2: 0.50
-safety_factor: 2.5
+robot_radius_0: 0.50      # [m]
+robot_radius_1: 0.50      # [m]
+robot_radius_2: 0.50      # [m]
+safety_factor: 2.5        # [-] This parameters inflates the robot radius when checking collisions amongst agents
 
 # Velocities and accelerations
-v_max: 1.0                    # [m/s]
-a_max: 1.0                    # [m/s^2]
-v_yaw_max: 0.75               # [rad/s] --> not used for ramp interpolator
-a_yaw_max: 1.0                # [rad/s^2] --> not used for ramp interpolator
-sampling_dt: 0.5              # [s] Sampling time for trajectory
+v_max: 1.0                # [m/s]
+a_max: 1.0                # [m/s^2]
+v_yaw_max: 0.75           # [rad/s] --> not used for ramp interpolator
+a_yaw_max: 1.0            # [rad/s^2] --> not used for ramp interpolator
+sampling_dt: 0.5          # [s] Sampling time for trajectory
 
 # Visualization
 scale_factor_visualization: 2.0
@@ -41,11 +45,13 @@ optimistic: true
 
 use_distance_threshold: true
 distance_threshold: 1.3
+
 optimization_objective: 0 # 0: Default, 1: Altitude
 interpolator: 1 # 0: Polynomial, 1: Ramp (default: Polynomial)
 
-altitude_obj_params/alpha: 1.0
-altitude_obj_params/beta: 10.0
+# Additional parameters used only with altitude objective
+altitude_obj_params/alpha: 1.0 # Weight of path lenght objective
+altitude_obj_params/beta: 10.0 # Weight of height deviation from nominal value
 
 # Post processing
 simplify_solution: true

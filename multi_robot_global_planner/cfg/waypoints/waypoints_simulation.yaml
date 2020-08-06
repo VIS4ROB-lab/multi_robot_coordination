@@ -1,20 +1,20 @@
 # Waypoint list
 coordinate_type: "enu" # If the trajectory is ENU, we assume that the waypoints are expressed in the WORLD frame
-gps_reference: [47.4503488, 8.6815056, 0.0]
+gps_reference: [47.4503496912, 8.68157239084, 1.0] # If trajectory is ENU, this is not used
 
 # Trajectory
 agent_0:
     # x (ENU) [m] / longitude (GPS) [deg]
-    easting: [22.0, 38.0, 7.5] #[47.4506908507] #[38.0]
+    easting: [3.0, 3.50]
     # y (ENU) [m] / latitude (GPS) [deg]
-    northing: [-17.0, 34.0, 43.0] #[8.68106749915] #[33.0]
+    northing: [-3.0, -2.0]
     # z (ENU) [m] / altitude (GPS) [m]
-    height: [-0.5, -0.5, -0.5]
-    
+    height: [1.0, 1.0]
+
 agent_1:
     # x (ENU) [m] / longitude (GPS) [deg]
-    easting: [21.0, -5.0, -29.0, -13.0] #[35.0]
+    easting: [5.0, 10.0]
     # y (ENU) [m] / latitude (GPS) [deg]
-    northing: [-33.0, -31.0, -31.0, 52.0] #[25.0]
+    northing: [5.0, 5.0] #northing: [5.0, 3.0]
     # z (ENU) [m] / altitude (GPS) [m]
-    height: [-0.5, -0.5, -0.5, -0.5]
+    height: [1.0, 1.0]

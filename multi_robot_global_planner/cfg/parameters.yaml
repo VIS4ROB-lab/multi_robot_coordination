@@ -1,11 +1,16 @@
 ################################################################################
 ############################## PLANNER PARAMETERS ##############################
 ################################################################################
+# Available planning strategies:
+# - One by one: plan a global path for all the agents independently and in sequence. This will not consider the collisions amongst agents
+# - One shot: solves the planning problem for all the agents in one shot. This is not optimal and fails quite often, due to the complexity of the problem
+# - Constrained one by one: this is the planning strategy introduced in the paper. It will try to find the paths for all the agents, avoiding collisions with the obstacles and with the other agents
 planning_strategy: 2 # 0: One by one, 1: One shot, 2: Constrained One by One
 # Note: the custom sampler for the constrained one by one strategy works only
 # with prm*
+
 timer_dt: 3.0
-clock_replanning: -30.0 # set to negative value not to force replanning
+clock_replanning: -30.0 # set to negative value not to force replanning; if positive, a replanning iteration is forced after "clock_replanning" seconds
 num_seconds_to_plan: 15.0
 
 # Reference frames
@@ -39,18 +44,20 @@ optimistic: true
 
 use_distance_threshold: true
 distance_threshold: 1.20
+
 optimization_objective: 0 # 0: Default, 1: Altitude
 interpolator: 1 # 0: Polynomial, 1: Ramp (default: Polynomial)
 
-altitude_obj_params/alpha: 1.0
-altitude_obj_params/beta: 10.0
+# Additional parameters used only with altitude objective
+altitude_obj_params/alpha: 1.0 # Weight of path lenght objective
+altitude_obj_params/beta: 10.0 # Weight of height deviation from nominal value
 
 # Post processing
 simplify_solution: true
 trust_approx_solution: false
 
 # Checks if goal has been reached
-goal_threshold: 0.2 # In simulation try to reach the goal "exactly"
+goal_threshold: 0.2 # [m] --> In simulation try to reach the goal "exactly"
 
 # Miscellanoeus
 visualize: true
@@ -69,7 +76,7 @@ upper_bound_z: 3.5
 tsdf_voxels_per_side: 16
 slice_level: 1.0
 
-update_mesh_every_n_sec: 0.0
+update_mesh_every_n_sec: 1.0
 
 publish_traversable: true
 split_at_collisions: 0.5
