@@ -8,7 +8,7 @@ The video can be found [here](https://www.youtube.com/watch?v=BlFbiuV-d10).
 ## Installation instructions
 Install Ubuntu 18.04 and ROS Melodic. Install these dependencies:
 ```
-$ sudo apt install python-catkin-tools python-wstool ros-melodic-joy ros-melodic-octomap-ros protobuf-compiler libgoogle-glog-dev ros-melodic-mav-msgs ros-melodic-mav-planning-msgs ros-melodic-sophus libatlas-base-dev python-matplotlib python-numpy
+$ sudo apt install python-catkin-tools python-wstool ros-melodic-joy ros-melodic-octomap-ros protobuf-compiler libgoogle-glog-dev ros-melodic-mav-msgs ros-melodic-mav-planning-msgs ros-melodic-sophus ros-melodic-hector-gazebo-plugins ros-melodic-pcl-ros ros-melodic-pcl-conversions libatlas-base-dev python-matplotlib python-numpy
 $ sudo apt install liblapacke-dev libode6 libompl-dev libompl12 libopenexr-dev libglm-dev
 $ sudo apt install clang-format
 ```  
@@ -52,4 +52,4 @@ $ catkin build
 * If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
 
 ## Contributing
-Contributions that help improving the code are welcome. In case you want to contribute, please adapt to our C++ standards and run `bash clang-format-all .` on your code before committing.
+Contributions that help improving the code are welcome. In case you want to contribute, please adapt to the [Google C++ coding style](https://google.github.io/styleguide/cppguide.html/) and run `bash clang-format-all .` on your code before committing.

@@ -1,84 +1,55 @@
 <launch>
 
     <!-- Start Gazebo, spawn MAV -->
-    <arg name="mav_name" default="firefly"/>
-    <arg name="mav_name_0" default="firefly_0"/>
-    <arg name="enable_logging" default="false"/>
-    <arg name="enable_ground_truth" default="true"/>
-    <arg name="log_file" default="$(arg mav_name)"/>
-    <arg name="run_gazebo_gui" default="false"/>
-    <arg name="world" default="urban"/>
+    <arg name="mav_name"   default="firefly"/>
+    <arg name="id"         default="0"/>
     
-    <arg name="x_0" default="0.0"/>
-    <arg name="y_0" default="-5.0"/>
-    <arg name="z_0" default="0.3"/>
+    <arg name="x_0"        default="0.0"/>
+    <arg name="y_0"        default="-5.0"/>
+    <arg name="z_0"        default="0.3"/>
     
-    <arg name="x_ctrl_0" default="0.0"/>
-    <arg name="y_ctrl_0" default="0.0"/>
-    <arg name="z_ctrl_0" default="1.0"/>
+    <arg name="x_ctrl_0"   default="0.0"/>
+    <arg name="y_ctrl_0"   default="0.0"/>
+    <arg name="z_ctrl_0"   default="1.0"/>
     <arg name="yaw_ctrl_0" default="0.0"/>
+    
+    <arg name="enable_logging"      default="false"/>
+    <arg name="enable_ground_truth" default="true"/>
+    <arg name="log_file"            default="$(arg mav_name)"/>
+    <arg name="run_gazebo_gui"      default="false"/>
+    <arg name="world"               default="urban"/>
 
+    <!-- Run Gazebo -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find multi_robot_simulation)/worlds/$(arg world).world"/>
         <arg name="paused" value="false" />
         <arg name="gui" value="$(arg run_gazebo_gui)" />
     </include>
 
-    <group ns="$(arg mav_name_0)">
-        <include file="$(find rotors_gazebo)/launch/spawn_mav.launch">
-            <arg name="mav_name" value="$(arg mav_name)" />
-            <arg name="namespace" value="$(arg mav_name_0)" />
-            <arg name="model" value="$(find multi_robot_simulation)/descriptions/$(arg mav_name)_base_gps.xacro" />
-            <arg name="enable_logging" value="$(arg enable_logging)" />
-            <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
-            <arg name="log_file" value="$(arg log_file)"/>
-            <arg name="x" value="$(arg x_0)"/>
-            <arg name="y" value="$(arg y_0)"/>
-            <arg name="z" value="$(arg z_0)"/>
-        </include>
-
-        <!-- Start GPS converter -->
-        <node name="set_gps_reference_node" pkg="geodetic_utils" type="set_gps_reference_node" clear_params="true" output="screen" args="10">
-            <remap from="gps" to="fix" />
-        </node>
-
-        <node name="gps_to_pose_conversion_node" pkg="geodetic_utils" type="gps_to_pose_conversion_node" clear_params="true" output="screen">
-            <remap from="gps" to="fix" />
-            <remap from="imu" to="raw_imu" />
-            <param name="is_sim" value="true" />
-            <rosparam file="$(find geodetic_utils)/parameters/gps_pose_covariance.yaml"/>
-        </node>
-
-        <!-- Start controller -->
-        <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node" respawn="true" clear_params="true" output="screen">
-            <remap from="odometry" to="odometry" />
-            <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml" />
-            <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
-            <param name="use_rc_teleop" value="false"/>
-            <param name="verbose" value="false" />
-            <param name="reference_frame" value="odom_0"/>
-        </node>
-
-        <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
-            <remap from="odometry" to="ground_truth/odometry" />
-            <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
-        </node>
-        
-        <node name="hovering_example" pkg="rotors_gazebo" type="hovering_example" output="screen">
-        		<param name="x" value="$(arg x_ctrl_0)"/>
-            <param name="y" value="$(arg y_ctrl_0)"/>
-            <param name="z" value="$(arg z_ctrl_0)"/>
-            <param name="yaw" value="$(arg yaw_ctrl_0)"/>
-        </node>
-        
-        <node pkg="tf" type="static_transform_publisher" name="agent0_vi_broadcaster"
-              args="0.116 0.055 -0.025 -0.524 0.524 -0.474 0.474 agent_0 $(arg mav_name_0)/vi_sensor/camera_depth_optical_center_link 100" />
+    <!-- Spawn MAV -->
+    <group ns="$(arg mav_name)_$(arg id)">
+      <include file="$(find multi_robot_simulation)/launch/spawn_mav.launch">
+        <arg name="mav_name" value="$(arg mav_name)" />
+        <arg name="id" value="$(arg id)" />
+        <arg name="enable_logging" value="$(arg enable_logging)" />
+        <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+        <arg name="log_file" value="$(arg log_file)"/>
+            
+        <arg name="x" value="$(arg x_0)"/>
+        <arg name="y" value="$(arg y_0)"/>
+        <arg name="z" value="$(arg z_0)"/>
+         
+        <arg name="x_ctrl" value="$(arg x_ctrl_0)"/>
+        <arg name="y_ctrl" value="$(arg y_ctrl_0)"/>
+        <arg name="z_ctrl" value="$(arg z_ctrl_0)"/>
+        <arg name="yaw_ctrl" value="$(arg yaw_ctrl_0)"/>
+      </include>
     </group>
 
     <!-- Include simulated backend -->
-    <include file="$(find multi_robot_simulation)/launch/simulated_backend.launch"/>
+    <include file="$(find multi_robot_simulation)/launch/simulated_backend_single.launch"/>
     
     <!-- Start RViz -->
-    <node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find multi_robot_simulation)/rviz/simulation.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find multi_robot_simulation)/cfg/rviz/simulation.rviz"/>
 
 </launch>

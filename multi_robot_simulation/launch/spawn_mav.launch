@@ -1,0 +1,73 @@
+<launch>
+
+    <!-- Arguments to be set -->
+    <arg name="mav_name" />
+    <arg name="id" />
+    
+    <arg name="x" />
+    <arg name="y" />
+    <arg name="z" />
+    
+    <arg name="x_ctrl" />
+    <arg name="y_ctrl" />
+    <arg name="z_ctrl" />
+    <arg name="yaw_ctrl" />
+    
+    <!-- Default arguments -->
+    <arg name="enable_logging" default="false"/>
+    <arg name="enable_ground_truth" default="true"/>
+    <arg name="log_file" default="$(arg mav_name)"/>
+
+    <!-- Spawn MAV -->
+    <include file="$(find rotors_gazebo)/launch/spawn_mav.launch">
+      <arg name="mav_name" value="$(arg mav_name)" />
+      <arg name="namespace" value="$(arg mav_name)_$(arg id)" />
+      <arg name="model" value="$(find multi_robot_simulation)/descriptions/$(arg mav_name)_base_gps.xacro" />
+      <arg name="enable_logging" value="$(arg enable_logging)" />
+      <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+      <arg name="log_file" value="$(arg log_file)"/>
+      <arg name="x" value="$(arg x)"/>
+      <arg name="y" value="$(arg y)"/>
+      <arg name="z" value="$(arg z)"/>
+    </include>
+
+    <!-- Start GPS converter -->
+    <node name="set_gps_reference_node" pkg="geodetic_utils" type="set_gps_reference_node" clear_params="true" output="screen" args="10">
+      <remap from="gps" to="fix" />
+    </node>
+
+    <node name="gps_to_pose_conversion_node" pkg="geodetic_utils" type="gps_to_pose_conversion_node" clear_params="true" output="screen">
+      <remap from="gps" to="fix" />
+      <remap from="imu" to="raw_imu" />
+      <param name="is_sim" value="true" />
+      <rosparam file="$(find geodetic_utils)/parameters/gps_pose_covariance.yaml"/>
+    </node>
+
+    <!-- Start controller -->
+    <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node" respawn="true" clear_params="true" output="screen">
+      <remap from="odometry" to="odometry" />
+      <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml" />
+      <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+      <param name="use_rc_teleop" value="false"/>
+      <param name="verbose" value="false" />
+      <param name="reference_frame" value="odom_$(arg id)"/>
+    </node>
+
+    <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
+      <remap from="odometry" to="ground_truth/odometry" />
+      <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
+    </node>
+        
+    <!-- Hovering -->
+    <node name="hovering_example" pkg="rotors_gazebo" type="hovering_example" output="screen">
+      <param name="x" value="$(arg x_ctrl)"/>
+      <param name="y" value="$(arg y_ctrl)"/>
+      <param name="z" value="$(arg z_ctrl)"/>
+      <param name="yaw" value="$(arg yaw_ctrl)"/>
+    </node>
+        
+    <!-- TFs -->
+    <node pkg="tf" type="static_transform_publisher" name="agent_$(arg id)_vi_broadcaster"
+          args="0.116 0.055 -0.025 -0.524 0.524 -0.474 0.474 agent_$(arg id) $(arg mav_name)_$(arg id)/vi_sensor/camera_depth_optical_center_link 100" />
+
+</launch>
