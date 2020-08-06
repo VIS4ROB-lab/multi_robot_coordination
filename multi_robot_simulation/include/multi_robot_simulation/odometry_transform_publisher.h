@@ -25,7 +25,8 @@ struct RandomWalkParams {
 };
 
 class OdometryTransformPublisher {
- public:
+
+public:
   /**
    * @brief Constructor of the class
    * @param[in] nh : ROS node handle
@@ -39,7 +40,7 @@ class OdometryTransformPublisher {
    */
   ~OdometryTransformPublisher();
 
- private:
+private:
   /**
    * @brief Read the parameters from the server
    * @return True if all parameters were parsed correctly, false otherwise
@@ -65,12 +66,14 @@ class OdometryTransformPublisher {
   void odometryCallback(const nav_msgs::OdometryConstPtr &odom_msg,
                         const uint64_t agent_id);
 
- protected:
+protected:
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
 
   std::vector<ros::Subscriber> odometry_subs_;
   std::vector<ros::Publisher> odometry_pubs_;
+  std::vector<ros::Publisher> transf_W_M_pubs_;
+  std::vector<ros::Publisher> transf_M_O_pubs_;
 
   tf::TransformBroadcaster tf_broadcaster_;
 
@@ -83,6 +86,6 @@ class OdometryTransformPublisher {
   std::vector<RandomWalkParams> random_walk_params_;
   std::vector<std::string> agents_ns_;
 
-};  // end class OdometryTransformPublisher
+}; // end class OdometryTransformPublisher
 
-}  // end namespace mrp
+} // end namespace mrp

@@ -5,25 +5,24 @@
 
 #include "multi_robot_simulation/gps_pose_graph_initializer.h"
 
+#include <trajectory_msgs/MultiDOFJointTrajectory.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <mav_msgs/default_topics.h>
 #include <mav_trajectory_generation/polynomial_optimization_linear.h>
 #include <mav_trajectory_generation/trajectory_sampling.h>
 #include <mav_trajectory_generation_ros/ros_visualization.h>
-#include <trajectory_msgs/MultiDOFJointTrajectory.h>
-#include <visualization_msgs/MarkerArray.h>
 
 namespace mrp {
 
 GpsPoseGraphInitializer::GpsPoseGraphInitializer(
-    const ros::NodeHandle &nh, const ros::NodeHandle &nh_private,
-    const int agent_id)
-    : nh_(nh),
-      nh_private_(nh_private),
-      has_odometry_(false),
+        const ros::NodeHandle &nh, const ros::NodeHandle &nh_private,
+        const int agent_id)
+    : nh_(nh), nh_private_(nh_private), has_odometry_(false),
       agent_id_(agent_id) {
+
   // Get parameters
-  std::string ns("gps_pose_graph_initializer_node_" +
-                 std::to_string(agent_id_) + "/");
+  std::string ns(
+          "gps_pose_graph_initializer_node_" + std::to_string(agent_id_) + "/");
 
   double n_sec_wait;
   CHECK(nh_.getParam(ns + "n_sec_wait", n_sec_wait));
@@ -32,34 +31,23 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
   CHECK(nh_.getParam(ns + "delta_d", delta_d));
 
   double v_max, a_max, v_max_yaw, a_max_yaw, sampling_dt;
-  if (!nh_.getParam(ns + "v_max", v_max)) {
-    v_max = 2.0;
-  }
-  if (!nh_.getParam(ns + "a_max", a_max)) {
-    a_max = 2.0;
-  }
-  if (!nh_.getParam(ns + "v_max_yaw", v_max_yaw)) {
-    v_max = 2.0;
-  }
-  if (!nh_.getParam(ns + "a_max_yaw", a_max_yaw)) {
-    a_max = 2.0;
-  }
-  if (!nh_.getParam(ns + "sampling_dt", sampling_dt)) {
-    sampling_dt = 2.0;
-  }
+  if(!nh_.getParam(ns + "v_max", v_max)) { v_max = 2.0; }
+  if(!nh_.getParam(ns + "a_max", a_max)) { a_max = 2.0; }
+  if(!nh_.getParam(ns + "v_max_yaw", v_max_yaw)) { v_max = 2.0; }
+  if(!nh_.getParam(ns + "a_max_yaw", a_max_yaw)) { a_max = 2.0; }
+  if(!nh_.getParam(ns + "sampling_dt", sampling_dt)) { sampling_dt = 2.0; }
 
   // Set up ros communication
-  odom_sub_ =
-      nh_.subscribe("odometry_" + std::to_string(agent_id_), 10,
-                    &mrp::GpsPoseGraphInitializer::odometryCallback, this);
+  odom_sub_ = nh_.subscribe("odometry_" + std::to_string(agent_id_), 10,
+          &mrp::GpsPoseGraphInitializer::odometryCallback, this);
   trajectory_cmd_pub_ = nh_.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
-      mav_msgs::default_topics::COMMAND_TRAJECTORY, 100);
-  command_vis_pub_ =
-      nh_.advertise<visualization_msgs::MarkerArray>("init_movement_gps", 100);
+          mav_msgs::default_topics::COMMAND_TRAJECTORY, 100);
+  command_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
+          "init_movement_gps", 100);
 
   // Wait until you get odometry
   ros::Duration(n_sec_wait).sleep();
-  while (!has_odometry_) {
+  while(!has_odometry_) {
     ros::Duration(0.5).sleep();
     ros::spinOnce();
   }
@@ -77,10 +65,11 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
   waypoints[8] += Eigen::Vector3d(delta_d, -delta_d, 0.0);
 
   std::cout << "Sending waypoints: " << std::endl;
-  for (size_t i = 0; i < waypoints.size(); ++i) {
-    std::cout << std::setprecision(3) << waypoints[i].x() << ", "
-              << waypoints[i].y() << ", " << waypoints[i].z() << ";"
-              << std::endl;
+  for(size_t i = 0; i < waypoints.size(); ++i) {
+    std::cout << std::setprecision(3)
+              << waypoints[i].x() << ", "
+              << waypoints[i].y() << ", "
+              << waypoints[i].z() << ";" << std::endl;
   }
 
   std::vector<double> yaws(8, odometry_.getYaw());
@@ -89,9 +78,9 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
   mav_trajectory_generation::Vertex::Vector vertices, vertices_yaw;
   const int dimension = 3;
   const int derivative_to_optimize =
-      mav_trajectory_generation::derivative_order::ACCELERATION;
+          mav_trajectory_generation::derivative_order::ACCELERATION;
   const int derivative_to_optimize_yaw =
-      mav_trajectory_generation::derivative_order::ANGULAR_ACCELERATION;
+          mav_trajectory_generation::derivative_order::ANGULAR_ACCELERATION;
 
   mav_trajectory_generation::Vertex vertex(dimension), vertex_yaw(1);
   vertex.makeStartOrEnd(waypoints[0], derivative_to_optimize);
@@ -105,7 +94,7 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
   for (size_t i = 1; i < waypoints.size() - 1; ++i) {
     mav_trajectory_generation::Vertex vertex_m(dimension), vertex_yaw_m(1);
     vertex_m.addConstraint(
-        mav_trajectory_generation::derivative_order::POSITION, waypoints[i]);
+            mav_trajectory_generation::derivative_order::POSITION, waypoints[i]);
 
     if (std::abs(yaws[i] + 2 * M_PI - yaw_old) < std::abs(yaws[i] - yaw_old)) {
       yaw_old = yaws[i] + 2 * M_PI;
@@ -117,7 +106,7 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
     }
 
     vertex_yaw_m.addConstraint(
-        mav_trajectory_generation::derivative_order::ORIENTATION, yaw_old);
+            mav_trajectory_generation::derivative_order::ORIENTATION, yaw_old);
     vertices.push_back(vertex_m);
     vertices_yaw.push_back(vertex_yaw_m);
   }
@@ -138,16 +127,17 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
 
   // Step 3: obtain interpolated trajectory
   std::vector<double> segment_times =
-      mav_trajectory_generation::estimateSegmentTimes(vertices, v_max, a_max);
+          mav_trajectory_generation::estimateSegmentTimes(vertices, v_max, a_max);
   std::vector<double> segment_times_yaw{
-      mav_trajectory_generation::estimateSegmentTimes(vertices_yaw, v_max_yaw,
-                                                      a_max_yaw)};
+          mav_trajectory_generation::estimateSegmentTimes(vertices_yaw,
+                  v_max_yaw, a_max_yaw)};
 
   for (int i = 0; i < segment_times.size(); ++i) {
     if (segment_times_yaw[i] > segment_times[i])
       segment_times[i] = segment_times_yaw[i];
 
-    if (segment_times[i] < sampling_dt) segment_times[i] = sampling_dt;
+    if (segment_times[i] < sampling_dt)
+      segment_times[i] = sampling_dt;
   }
 
   const int N = 10;
@@ -178,7 +168,7 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
   cmd_trajectory.header.frame_id = frame_id_;
   cmd_trajectory.header.stamp = ros::Time::now();
 
-  for (int i = 0; i < states.size(); ++i) {
+  for(int i = 0; i < states.size(); ++i) {
     trajectory_msgs::MultiDOFJointTrajectoryPoint cmd_point;
     cmd_point.transforms.resize(1);
     cmd_point.transforms[0].translation.x = states[i].position_W.x();
@@ -208,32 +198,29 @@ GpsPoseGraphInitializer::GpsPoseGraphInitializer(
     cmd_point.accelerations[0].angular.y = states[i].angular_acceleration_W.y();
     cmd_point.accelerations[0].angular.z = states[i].angular_acceleration_W.z();
 
-    cmd_point.time_from_start =
-        ros::Duration(states[i].time_from_start_ns * 1e-9);
+    cmd_point.time_from_start = ros::Duration(
+            states[i].time_from_start_ns * 1e-9);
 
     cmd_trajectory.points.push_back(cmd_point);
   }
 
   // Visualization
   visualization_msgs::MarkerArray markers;
-  double distance = 1.0;  // Distance by which to seperate additional markers.
-                          // Set 0.0 to disable.
+  double distance = 1.0; // Distance by which to seperate additional markers. Set 0.0 to disable.
   mav_trajectory_generation::drawMavSampledTrajectory(states, distance,
-                                                      frame_id_, &markers);
+          frame_id_, &markers);
   command_vis_pub_.publish(markers);
 
   // Publish the controller command
   trajectory_cmd_pub_.publish(cmd_trajectory);
-  ROS_INFO_STREAM(
-      "[GPS Initializer] Sent trajectory for initialization of "
-      "agent "
-      << agent_id_);
+  ROS_INFO_STREAM("[GPS Initializer] Sent trajectory for initialization of "
+                  "agent " << agent_id_);
 }
 
 GpsPoseGraphInitializer::~GpsPoseGraphInitializer() {}
 
 void GpsPoseGraphInitializer::odometryCallback(
-    const nav_msgs::OdometryConstPtr &odom_msg) {
+        const nav_msgs::OdometryConstPtr &odom_msg) {
   ROS_INFO_ONCE("[GPS Initializer] Initialize odometry");
 
   has_odometry_ = true;
@@ -241,4 +228,4 @@ void GpsPoseGraphInitializer::odometryCallback(
   mav_msgs::eigenOdometryFromMsg(*odom_msg, &odometry_);
 }
 
-}  // end namespace mrp
+} // end namespace mrp

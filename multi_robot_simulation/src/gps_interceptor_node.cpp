@@ -19,6 +19,7 @@ void gpsCallback(const sensor_msgs::NavSatFixConstPtr &gps_msg) {
 }
 
 int main(int argc, char *argv[]) {
+
   // Get the agent id
   if (argc < 2) {
     ROS_ERROR("[GPS Interceptor] Could not initialize, missing agent id!");
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
 
   // Initialize publisher and subscriber
   gps_pub = nh.advertise<sensor_msgs::NavSatFix>(
-      "fix_" + std::to_string(agent_id), 10);
+          "fix_" + std::to_string(agent_id), 10);
   gps_sub = nh.subscribe("gps", 10, gpsCallback);
 
   // Spin

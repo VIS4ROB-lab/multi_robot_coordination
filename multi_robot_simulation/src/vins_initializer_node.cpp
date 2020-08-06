@@ -7,6 +7,7 @@
 #include "multi_robot_simulation/vins_initializer.h"
 
 int main(int argc, char *argv[]) {
+
   // Get the agent id
   if (argc < 2) {
     ROS_ERROR("[Vins Initializer] Could not initialize, missing agent id!");

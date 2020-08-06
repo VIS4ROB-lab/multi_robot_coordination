@@ -8,6 +8,7 @@
 #include "multi_robot_simulation/command_interceptor.h"
 
 int main(int argc, char *argv[]) {
+
   // Get the agent id
   if (argc < 2) {
     ROS_ERROR("[Command Interceptor] Could not initialize, missing agent id!");
