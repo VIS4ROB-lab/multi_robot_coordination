@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>posegraph_msgs</name>
+  <name>comm_msgs</name>
   <version>0.0.0</version>
   <description>Custom message to send keyframe data</description>
   <maintainer email="marco.karrer@mavt.ethz.ch">Marco Karrer</maintainer>

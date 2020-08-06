@@ -8,7 +8,7 @@
 #include <pcl/common/transforms.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <posegraph_msgs/pcl_transform.h>
+#include <comm_msgs/pcl_transform.h>
 #include <Eigen/Eigen>
 
 namespace mrp {
@@ -77,7 +77,7 @@ void PointcloudTransformator::initPublisher() {
   for (uint64_t id = 0; id < num_agents_; ++id) {
     std::string pcl_topic(agents_ns_[id] + "/transform_pointcloud");
     ros::Publisher tmp_pub_pcl =
-        nh_.advertise<posegraph_msgs::pcl_transform>(pcl_topic, 10);
+        nh_.advertise<comm_msgs::pcl_transform>(pcl_topic, 10);
     pcl_transform_pubs_.push_back(tmp_pub_pcl);
 
     std::string downsampled_pcl_topic(agents_ns_[id] +
@@ -123,7 +123,7 @@ void PointcloudTransformator::pointcloudCallback(
     tf::transformTFToEigen(tf::Transform(tf_transform_stamped.getRotation(),
                                          tf_transform_stamped.getOrigin()),
                            affine_tranf);
-    posegraph_msgs::pcl_transform pcl_transform_msg;
+    comm_msgs::pcl_transform pcl_transform_msg;
     pcl_transform_msg.header.frame_id = world_frame_;
     pcl_transform_msg.header.seq = 0;
     pcl_transform_msg.header.stamp = ros::Time::now();
