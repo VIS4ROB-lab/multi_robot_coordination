@@ -7,7 +7,6 @@
 #include "multi_robot_simulation/pointcloud_filter.h"
 
 int main(int argc, char** argv) {
-
   // Get the agent id
   if (argc < 2) {
     ROS_ERROR("[PCL Filter] Could not initialize filter, missing agent id!");
@@ -20,7 +19,7 @@ int main(int argc, char** argv) {
   ros::NodeHandle nh("");
   ros::NodeHandle nh_private("~");
   pointcloud_filter::PointcloudFilter pcl_filter_node(nh, nh_private, agent_id);
- 
+
   ros::spin();
   return 0;
 }

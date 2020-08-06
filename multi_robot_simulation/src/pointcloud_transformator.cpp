@@ -5,11 +5,11 @@
 
 #include "multi_robot_simulation/pointcloud_transformator.h"
 
-#include <Eigen/Eigen>
-#include <posegraph_msgs/pcl_transform.h>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <posegraph_msgs/pcl_transform.h>
+#include <Eigen/Eigen>
 
 namespace mrp {
 
@@ -23,7 +23,6 @@ PointcloudTransformator::PointcloudTransformator(
 }
 
 bool PointcloudTransformator::readParameters() {
-
   // Read how many sources
   bool load_success = nh_private_.getParam("num_agents", num_agents_);
   CHECK(load_success) << "Failed to load the number of agents.";
@@ -80,9 +79,9 @@ void PointcloudTransformator::initPublisher() {
     ros::Publisher tmp_pub_pcl =
         nh_.advertise<posegraph_msgs::pcl_transform>(pcl_topic, 10);
     pcl_transform_pubs_.push_back(tmp_pub_pcl);
-    
-    std::string downsampled_pcl_topic(
-        agents_ns_[id] + "/downsampled_pointcloud");
+
+    std::string downsampled_pcl_topic(agents_ns_[id] +
+                                      "/downsampled_pointcloud");
     ros::Publisher tmp_pub_downsampled_pcl =
         nh_.advertise<sensor_msgs::PointCloud2>(downsampled_pcl_topic, 10);
     pointcloud_pubs_.push_back(tmp_pub_downsampled_pcl);
@@ -91,7 +90,6 @@ void PointcloudTransformator::initPublisher() {
 
 void PointcloudTransformator::pointcloudCallback(
     const sensor_msgs::PointCloud2ConstPtr &pcl_msg, const uint64_t agent_id) {
-
   // Transform the pointcloud and publish it as a ROS message
   PointcloudPCL::Ptr pointcloud_in_cam_frame(new PointcloudPCL);
   PointcloudPCL::Ptr pointcloud_in_cam_frame_filtered(new PointcloudPCL);
@@ -109,7 +107,7 @@ void PointcloudTransformator::pointcloudCallback(
   filtered_cloud_msg.header.stamp = ros::Time::now();
   filtered_cloud_msg.header.frame_id = pcl_msg->header.frame_id;
 
-  if(publish_pcl_world_) {
+  if (publish_pcl_world_) {
     // Extract the transformation from the camera frame to the world frame
     tf::StampedTransform tf_transform_stamped;
     try {
@@ -117,7 +115,7 @@ void PointcloudTransformator::pointcloudCallback(
                                    ros::Time(0), tf_transform_stamped);
     } catch (tf::TransformException &ex) {
       ROS_ERROR_STREAM(
-              "Error getting TF transform from sensor data: " << ex.what());
+          "Error getting TF transform from sensor data: " << ex.what());
       return;
     }
 
@@ -142,13 +140,13 @@ void PointcloudTransformator::pointcloudCallback(
 
     ROS_INFO_ONCE("Published first transformed pointcloud");
     pcl_transform_pubs_[agent_id].publish(pcl_transform_msg);
-    
+
     // Publish debug pointcloud
-    if(pointcloud_pubs_[agent_id].getNumSubscribers() > 0) {
+    if (pointcloud_pubs_[agent_id].getNumSubscribers() > 0) {
       ROS_INFO_ONCE("Published first filtered pointcloud");
       pointcloud_pubs_[agent_id].publish(filtered_cloud_msg);
     }
   }
 }
 
-} // end namespace mrp
+}  // end namespace mrp
