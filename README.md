@@ -48,8 +48,28 @@ $ cd ~/catkin_ws
 $ catkin build
 ```  
 
+Once the building is complete, source the workspace:
+```
+$ source devel/setup.bash
+```
+
+## Run Powerplant experiment
+In this experiment, three robots have to cover a list of user-defined waypoints in the RotorS `Powerplant` Gazebo model. In this case, the state estimates are provided by Gazebo and the pose-graph back-end will not be utilized. This experiment is meant to test and showcase the global planner.  
+First, start the simulation with:
+```
+$ roslaunch multi_robot_simulation mav_sim_three_powerplant.launch
+```  
+Once the simulation is started, it is possible to start the global planner and the local planners for all the agents in separate terminals:
+```
+$ roslaunch multi_robot_global_planner mrp_global_planner_powerplant.launch
+$ roslaunch agent_local_planner agent_local_planner.launch agent_id:=0
+$ roslaunch agent_local_planner agent_local_planner.launch agent_id:=1
+$ roslaunch agent_local_planner agent_local_planner.launch agent_id:=2
+```  
+To start the experiments, call the service `rosservice call /multi_robot_global_planner/plan "{}"`. It is possible to change the waypoints for the agents in the file `multi_robot_global_planner/cfg/waypoints/waypoints_powerplant.yaml`.
+
 ## Troubleshooting
 * If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
 
 ## Contributing
-Contributions that help improving the code are welcome. In case you want to contribute, please adapt to the [Google C++ coding style](https://google.github.io/styleguide/cppguide.html/) and run `bash clang-format-all .` on your code before committing.
+Contributions that help to improve the code are welcome. In case you want to contribute, please adapt to the [Google C++ coding style](https://google.github.io/styleguide/cppguide.html/) and run `bash clang-format-all .` on your code before any commit.
