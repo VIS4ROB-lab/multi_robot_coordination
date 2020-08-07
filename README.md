@@ -30,7 +30,7 @@ Clone the dependencies:
 ```
 $ cd ~/catkin_ws/src
 $ wstool init
-$ wstool merge multi_robot_coordination/dependencies.rosinstall
+$ wstool merge multi_robot_coordination/dependencies_ssh.rosinstall # To clone with https: multi_robot_coordination/dependencies_https.rosinstall
 $ wstool up -j8
 ```
 

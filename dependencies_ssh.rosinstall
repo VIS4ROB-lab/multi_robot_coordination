@@ -23,9 +23,11 @@
 - git: {local-name: catkin_boost_python_buildtool, uri: 'git@github.com:ethz-asl/catkin_boost_python_buildtool.git'}
 - git: {local-name: numpy_eigen, uri: 'git@github.com:ethz-asl/numpy_eigen.git'}
 - git: {local-name: kindr, uri: 'git@github.com:ANYbotics/kindr.git'}
+- git: {local-name: ethzasl_apriltag2, uri: 'git@github.com:ethz-asl/ethzasl_apriltag2.git'}
 - git: {local-name: ewok, uri: 'git@github.com:VladyslavUsenko/ewok.git'}
 - git: {local-name: voxblox_multi_agent, uri: 'git@github.com:VIS4ROB-lab/voxblox_multi_agent.git'}
 - git: {local-name: pcl_fusion, uri: 'git@github.com:VIS4ROB-lab/pcl_fusion.git'}
 - git: {local-name: pose_graph_backend, uri: 'git@github.com:VIS4ROB-lab/pose_graph_backend.git'}
 - git: {local-name: robopt_open, uri: 'git@github.com:VIS4ROB-lab/robopt_open.git'}
 - git: {local-name: comm_msgs, uri: 'git@github.com:VIS4ROB-lab/comm_msgs.git'}
+- git: {local-name: vins_client_server, uri: 'git@github.com:VIS4ROB-lab/vins_client_server.git'}
