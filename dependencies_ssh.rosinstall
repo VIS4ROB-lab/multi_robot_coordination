@@ -31,3 +31,4 @@
 - git: {local-name: robopt_open, uri: 'git@github.com:VIS4ROB-lab/robopt_open.git'}
 - git: {local-name: comm_msgs, uri: 'git@github.com:VIS4ROB-lab/comm_msgs.git'}
 - git: {local-name: vins_client_server, uri: 'git@github.com:VIS4ROB-lab/vins_client_server.git'}
+- git: {local-name: ethzasl_msf, uri: 'git@github.com:VIS4ROB-lab/ethzasl_msf.git'}
