@@ -30,7 +30,7 @@ Clone the dependencies:
 ```
 $ cd ~/catkin_ws/src
 $ wstool init
-$ wstool merge ar_planning/dependencies.rosinstall
+$ wstool merge multi_robot_coordination/dependencies.rosinstall
 $ wstool up -j8
 ```
 

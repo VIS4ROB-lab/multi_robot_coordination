@@ -3,6 +3,12 @@
 - git: {local-name: eigen_checks, uri: 'git@github.com:ethz-asl/eigen_checks.git'}
 - git: {local-name: glog_catkin, uri: 'git@github.com:ethz-asl/glog_catkin.git'}
 - git: {local-name: protobuf_catkin, uri: 'git@github.com:ethz-asl/protobuf_catkin.git'}
+- git: {local-name: ceres_catkin, uri: 'git@github.com:ethz-asl/ceres_catkin.git'}
+- git: {local-name: opencv3_catkin, uri: 'git@github.com:ethz-asl/opencv3_catkin.git'}
+- git: {local-name: doxygen_catkin, uri: 'git@github.com:ethz-asl/doxygen_catkin.git'}
+- git: {local-name: opengv, uri: 'git@github.com:ethz-asl/opengv.git'}
+- git: {local-name: ethzasl_brisk, uri: 'git@github.com:ethz-asl/ethzasl_brisk.git'}
+- git: {local-name: aslam_cv2, uri: 'git@github.com:ethz-asl/aslam_cv2.git'}
 - git: {local-name: mav_comm, uri: 'git@github.com:ethz-asl/mav_comm.git'}
 - git: {local-name: nlopt, uri: 'git@github.com:ethz-asl/nlopt.git'}
 - git: {local-name: mav_trajectory_generation, uri: 'git@github.com:ethz-asl/mav_trajectory_generation.git'}
@@ -19,3 +25,7 @@
 - git: {local-name: kindr, uri: 'git@github.com:ANYbotics/kindr.git'}
 - git: {local-name: ewok, uri: 'git@github.com:VladyslavUsenko/ewok.git'}
 - git: {local-name: voxblox_multi_agent, uri: 'git@github.com:VIS4ROB-lab/voxblox_multi_agent.git'}
+- git: {local-name: pcl_fusion, uri: 'git@github.com:VIS4ROB-lab/pcl_fusion.git'}
+- git: {local-name: pose_graph_backend, uri: 'git@github.com:VIS4ROB-lab/pose_graph_backend.git'}
+- git: {local-name: robopt_open, uri: 'git@github.com:VIS4ROB-lab/robopt_open.git'}
+- git: {local-name: comm_msgs, uri: 'git@github.com:VIS4ROB-lab/comm_msgs.git'}
