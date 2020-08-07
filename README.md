@@ -11,6 +11,7 @@ On the server side, the main components are:
 * Multi-robot Global Planner
 * Pose Graph Backend
 * Multi-agent Voxblox  
+
 Onboard each agent, the main components are:
 * Client-server version of VINS-Mono
 * Local Obstacle avoidance
