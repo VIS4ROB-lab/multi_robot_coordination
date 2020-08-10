@@ -92,6 +92,42 @@ $ cd ~/.gazebo/models/
 $ tar -xvf chemical_plant.tar.xz  # Unzip
 $ rm chemical_plant.tar.xz  # Remove zip file
 ```
+#### Note
+Running the experiments with more than one agent is not recommended on a single PC, unless you have a particularly powerful PC (since it would be running visual-inertial odometry, pointcloud filtering, Pose Graph optimization, loop detection, mesh reconstruction and path planning for every agent).  
+In general, it is recommended to outsource some of the computations to external PCs. In particular, we recommend to run on a central server:
+* Pose-graph backend;
+* Voxblox mapping;
+* Global path planning; and 
+* Gazebo. 
+
+Instead, on the single agents, run:
+* Visual-Inertial state estimation (VINS-Mono);
+* Local mapping;
+* Local path planning; and
+* MPC controller
+
+#### Run the simulation on multiple PCs
+Here we show how to run the Gazebo simulation on two PCs. Make sure that the two computers are connected to the same network (Wi-Fi or via cable - cable recommended). First, install:
+```
+$ sudo apt install net-tools
+```  
+On the PC where you are going to run the Gazebo simulation, start a `roscore`. Then, **in all the terminals you are going to use**, export the `ROS_IP` and set the `ROS Master URI`:  
+```
+$ ifconfig  # to get the IP of the first machine -> here ${machine_1_ip}
+$ export ROS_IP=${machine_1_ip}  
+$ export ROS_MASTER_URI=http://${machine_1_ip}:11311/
+```  
+Then you can start the simulation on the master PC (in this example, for four agents):  
+```
+$ roslaunch multi_robot_simulation mav_sim_chemical_plant_four.launch 
+```
+In the second PC, in **all the terminals** you are going to use, make sure you **export ROS_IP of the second machine** and the **ROS Master URI of the first machine**:
+```
+$ ifconfig # to get the IP of the second machine -> here ${machine_2_ip}
+$ export ROS_IP=${machine_2_ip}  
+$ export ROS_MASTER_URI=http://${machine_1_ip}:11311/  # Note: machine 1 here!
+``` 
+It is now possible to run other nodes on the two PCs - all the nodes will be connected to the same `rosmaster`.
 
 ### 1. Map navigation with 4 agents
 In this experiment, we show how to run the complete pipeline in order to perform a full exploration of an area of interest, selected at the beginning of the mission by the user.  
@@ -137,7 +173,7 @@ $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=2
 $ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=3
 $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=3
 ```
-Once everything is properly set up, it is possible to run the experiment. First, initialize MSF:
+Once everything is properly set up, it is possible to run the experiment. First, initialize MSF for all the agents:
 ```
 $ rosservice call /firefly_0/pose_sensor_vins_0/pose_sensor/initialize_msf_scale "scale: 1.0"
 $ rosservice call /firefly_1/pose_sensor_vins_1/pose_sensor/initialize_msf_scale "scale: 1.0"
