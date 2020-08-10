@@ -1,95 +1,95 @@
 <launch>
 
-    <!-- Start Gazebo, spawn MAV -->
-    <arg name="mav_name"   default="firefly"/>
-    <arg name="id"         default="0"/>
+  <!-- Start Gazebo, spawn MAV -->
+  <arg name="mav_name"   default="firefly"/>
+  <arg name="id"         default="0"/>
     
-    <!-- Initial pose and control commands -->
-    <arg name="x_0"        default="0.0"/>
-    <arg name="y_0"        default="16.0"/>
-    <arg name="z_0"        default="0.3"/>
+  <!-- Initial pose and control commands -->
+  <arg name="x_0"        default="0.0"/>
+  <arg name="y_0"        default="16.0"/>
+  <arg name="z_0"        default="0.3"/>
     
-    <arg name="x_ctrl_0"   default="0.0"/>
-    <arg name="y_ctrl_0"   default="0.0"/>
-    <arg name="z_ctrl_0"   default="1.0"/>
-    <arg name="yaw_ctrl_0" default="0.0"/>
+  <arg name="x_ctrl_0"   default="0.0"/>
+  <arg name="y_ctrl_0"   default="0.0"/>
+  <arg name="z_ctrl_0"   default="1.0"/>
+  <arg name="yaw_ctrl_0" default="0.0"/>
     
-    <arg name="x_1"        default="-26.0"/>
-    <arg name="y_1"        default="-31.0"/>
-    <arg name="z_1"        default="0.3"/>
+  <arg name="x_1"        default="-26.0"/>
+  <arg name="y_1"        default="-31.0"/>
+  <arg name="z_1"        default="0.3"/>
     
-    <arg name="x_ctrl_1"   default="0.0"/>
-    <arg name="y_ctrl_1"   default="0.0"/>
-    <arg name="z_ctrl_1"   default="1.0"/>
-    <arg name="yaw_ctrl_1" default="0.0"/>
+  <arg name="x_ctrl_1"   default="0.0"/>
+  <arg name="y_ctrl_1"   default="0.0"/>
+  <arg name="z_ctrl_1"   default="1.0"/>
+  <arg name="yaw_ctrl_1" default="0.0"/>
     
-    <!-- Other parameters -->
-    <arg name="enable_logging"      default="false"/>
-    <arg name="enable_ground_truth" default="true"/>
-    <arg name="log_file"            default="$(arg mav_name)"/>
-    <arg name="run_gazebo_gui"      default="false"/>
-    <arg name="world"               default="chemical-plant"/>
+  <!-- Other parameters -->
+  <arg name="enable_logging"      default="false"/>
+  <arg name="enable_ground_truth" default="true"/>
+  <arg name="log_file"            default="$(arg mav_name)"/>
+  <arg name="run_gazebo_gui"      default="false"/>
+  <arg name="world"               default="chemical-plant"/>
 
-    <!-- Run Gazebo -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find multi_robot_simulation)/worlds/$(arg world).world"/>
-        <arg name="paused" value="false" />
-        <arg name="gui" value="$(arg run_gazebo_gui)" />
+  <!-- Run Gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find multi_robot_simulation)/worlds/$(arg world).world"/>
+    <arg name="paused" value="false" />
+    <arg name="gui" value="$(arg run_gazebo_gui)" />
+  </include>
+
+  <!-- Spawn MAV -->
+  <group ns="$(arg mav_name)_0">
+    <include file="$(find multi_robot_simulation)/launch/spawn_mav.launch">
+      <arg name="mav_name"            value="$(arg mav_name)" />
+      <arg name="id"                  value="0" />
+      <arg name="enable_logging"      value="$(arg enable_logging)" />
+      <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+      <arg name="log_file"            value="$(arg log_file)"/>
+            
+      <arg name="x"        value="$(arg x_0)"/>
+      <arg name="y"        value="$(arg y_0)"/>
+      <arg name="z"        value="$(arg z_0)"/>
+         
+      <arg name="x_ctrl"   value="$(arg x_ctrl_0)"/>
+      <arg name="y_ctrl"   value="$(arg y_ctrl_0)"/>
+      <arg name="z_ctrl"   value="$(arg z_ctrl_0)"/>
+      <arg name="yaw_ctrl" value="$(arg yaw_ctrl_0)"/>
     </include>
+  </group>
 
-    <!-- Spawn MAV -->
-    <group ns="$(arg mav_name)_0">
-      <include file="$(find multi_robot_simulation)/launch/spawn_mav.launch">
-        <arg name="mav_name" value="$(arg mav_name)" />
-        <arg name="id" value="0" />
-        <arg name="enable_logging" value="$(arg enable_logging)" />
-        <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
-        <arg name="log_file" value="$(arg log_file)"/>
+  <!-- Spawn MAV -->
+  <group ns="$(arg mav_name)_1">
+    <include file="$(find multi_robot_simulation)/launch/spawn_mav.launch">
+      <arg name="mav_name"            value="$(arg mav_name)" />
+      <arg name="id"                  value="1" />
+      <arg name="enable_logging"      value="$(arg enable_logging)" />
+      <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+      <arg name="log_file"            value="$(arg log_file)"/>
             
-        <arg name="x" value="$(arg x_0)"/>
-        <arg name="y" value="$(arg y_0)"/>
-        <arg name="z" value="$(arg z_0)"/>
+      <arg name="x"        value="$(arg x_1)"/>
+      <arg name="y"        value="$(arg y_1)"/>
+      <arg name="z"        value="$(arg z_1)"/>
          
-        <arg name="x_ctrl" value="$(arg x_ctrl_0)"/>
-        <arg name="y_ctrl" value="$(arg y_ctrl_0)"/>
-        <arg name="z_ctrl" value="$(arg z_ctrl_0)"/>
-        <arg name="yaw_ctrl" value="$(arg yaw_ctrl_0)"/>
-      </include>
-    </group>
+      <arg name="x_ctrl"   value="$(arg x_ctrl_1)"/>
+      <arg name="y_ctrl"   value="$(arg y_ctrl_1)"/>
+      <arg name="z_ctrl"   value="$(arg z_ctrl_1)"/>
+      <arg name="yaw_ctrl" value="$(arg yaw_ctrl_1)"/>
+    </include>
+  </group>
 
-    <!-- Spawn MAV -->
-    <group ns="$(arg mav_name)_1">
-      <include file="$(find multi_robot_simulation)/launch/spawn_mav.launch">
-        <arg name="mav_name" value="$(arg mav_name)" />
-        <arg name="id" value="1" />
-        <arg name="enable_logging" value="$(arg enable_logging)" />
-        <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
-        <arg name="log_file" value="$(arg log_file)"/>
-            
-        <arg name="x" value="$(arg x_1)"/>
-        <arg name="y" value="$(arg y_1)"/>
-        <arg name="z" value="$(arg z_1)"/>
-         
-        <arg name="x_ctrl" value="$(arg x_ctrl_1)"/>
-        <arg name="y_ctrl" value="$(arg y_ctrl_1)"/>
-        <arg name="z_ctrl" value="$(arg z_ctrl_1)"/>
-        <arg name="yaw_ctrl" value="$(arg yaw_ctrl_1)"/>
-      </include>
-    </group>
-
-    <!-- Include simulated backend for controller purposes -->
-    <node name="odometry_transform_publisher" pkg="multi_robot_simulation" type="odometry_transform_publisher_node" respawn="false" clear_params="true" output="screen">
-        <rosparam file="$(find multi_robot_simulation)/cfg/parameters_vins_exp_common_map.yaml"/>
-    </node>
+  <!-- Include simulated backend for controller purposes -->
+  <node name="odometry_transform_publisher" pkg="multi_robot_simulation" type="odometry_transform_publisher_node" respawn="false" clear_params="true" output="screen">
+    <rosparam file="$(find multi_robot_simulation)/cfg/parameters_vins_exp_common_map.yaml"/>
+  </node>
     
-    <!-- Here we don't need it because the pointcloud is downsampled enough 
-    <node name="pointcloud_transformator_0" pkg="multi_robot_simulation" type="pointcloud_transformator_node" respawn="false" clear_params="true" output="screen">
-       <rosparam file="$(find multi_robot_simulation)/cfg/parameters_vins.yaml"/>
-       <remap from="filterd_pointcloud" to="filterd_pointcloud_0"/>
-    </node>
-    -->
+  <!-- Here we don't need it because the pointcloud is downsampled enough 
+  <node name="pointcloud_transformator_0" pkg="multi_robot_simulation" type="pointcloud_transformator_node" respawn="false" clear_params="true" output="screen">
+    <rosparam file="$(find multi_robot_simulation)/cfg/parameters_vins.yaml"/>
+    <remap from="filterd_pointcloud" to="filterd_pointcloud_0"/>
+  </node>
+  -->
     
-    <!-- Start RViz -->
-    <node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find multi_robot_simulation)/cfg/rviz/simulation.rviz"/>
+  <!-- Start RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find multi_robot_simulation)/cfg/rviz/simulation.rviz"/>
 
 </launch>

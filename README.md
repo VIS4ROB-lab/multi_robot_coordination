@@ -104,7 +104,7 @@ Instead, on the single agents, run:
 * Visual-Inertial state estimation (VINS-Mono);
 * Local mapping;
 * Local path planning; and
-* MPC controller
+* MPC controller.
 
 #### Run the simulation on multiple PCs
 Here we show how to run the Gazebo simulation on two PCs. Make sure that the two computers are connected to the same network (Wi-Fi or via cable - cable recommended). First, install:
@@ -130,7 +130,7 @@ $ export ROS_MASTER_URI=http://${machine_1_ip}:11311/  # Note: machine 1 here!
 It is now possible to run other nodes on the two PCs - all the nodes will be connected to the same `rosmaster`.
 
 ### 1. Map navigation with 4 agents
-In this experiment, we show how to run the complete pipeline in order to perform a full exploration of an area of interest, selected at the beginning of the mission by the user.  
+In this experiment, we show how to run the complete pipeline in order to perform a full exploration of an area of interest, selected at the beginning of the mission by the user. If multiple PCs are in use, make sure to run the right launch file on the right computer.  
 First, start the simulation:
 ```
 $ roslaunch multi_robot_simulation mav_sim_chemical_plant_four.launch
@@ -191,10 +191,105 @@ $ rostopic pub /multi_robot_global_planner/return_home std_msgs/Int16 "data: 0" 
 where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home.
 
 ### 2. Map re-use between agents
-In this experiment, we showcase the advantages of the centralized path-planning pipeline, by showing how an agent can re-use the map created by another robot. Notice that, due to the stochasticity of the RRT* planner, it may happen that in some runs one of the agents may not go through the same area mapped by the other UAVs.
+In this experiment, we showcase the advantages of the centralized path-planning pipeline, by showing how an agent can re-use the map created by another robot. Notice that, due to the stochasticity of the RRT* planner, it may happen that in some runs one of the agents may not go through the same area mapped by the other UAVs.  
+First, start the simulation:
+```
+$ roslaunch multi_robot_simulation mav_sim_chemical_plant_exp_common_map.launch
+```
+Once the simulation is started (i.e. wait for all the agents to be visible in RViz), it is possible to launch VINS-Mono and the mapping pipeline for every agent. These nodes should run onboard each agent's PC. For the first agent:
+```
+$ roslaunch multi_robot_simulation vins_sim.launch agent_id:=0
+$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_0.launch
+```
+Repeat the same operation for the other agent:
+```
+$ roslaunch multi_robot_simulation vins_sim.launch agent_id:=1
+$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_1.launch
+```  
+On the server's side, start the pose graph and wait for the initialization to be done:
+```
+$ roslaunch pose_graph_backend pose_graph_node_simulation.launch num_agents:=2
+```
+It is possible now to launch the path-planning pipeline. On the server's PC:
+```
+$ roslaunch multi_robot_global_planner mrp_global_planner_chemical_plant_exp_common_map.launch
+```
+On the agents' PCs, run on the respective PCs:
+```
+$ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=0
+$ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=0
+
+$ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=1
+$ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=1
+```
+Once everything is properly set up, it is possible to run the experiment. First, initialize MSF for all the agents:
+```
+$ rosservice call /firefly_0/pose_sensor_vins_0/pose_sensor/initialize_msf_scale "scale: 1.0"
+$ rosservice call /firefly_1/pose_sensor_vins_1/pose_sensor/initialize_msf_scale "scale: 1.0"
+```
+Then, start the planning:
+```
+$ rosservice call /multi_robot_global_planner/plan "{}"
+```  
+It is possible to trigger the `Return-Home` behaviour by publishing on the topic:
+```
+$ rostopic pub /multi_robot_global_planner/return_home std_msgs/Int16 "data: 0" -1
+```
+where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home.
 
 ## 3. Planning in same area of interest
 In the last experiment, we show the performace of the global planner when three agents have to navigate in the same area of interest.
+First, start the simulation:
+```
+$ roslaunch multi_robot_simulation mav_sim_chemical_plant_three_twist.launch
+```
+Once the simulation is started (i.e. wait for all the agents to be visible in RViz), it is possible to launch VINS-Mono and the mapping pipeline for every agent. These nodes should run onboard each agent's PC. For the first agent:
+```
+$ roslaunch multi_robot_simulation vins_sim.launch agent_id:=0
+$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_0.launch
+```
+Repeat the same operation for all the agents, launching the nodes in the respective PCs:
+```
+$ roslaunch multi_robot_simulation vins_sim.launch agent_id:=1
+$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_1.launch
+
+$ roslaunch multi_robot_simulation vins_sim.launch agent_id:=2
+$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_2.launch
+```  
+On the server's side, start the pose graph and wait for the initialization to be done:
+```
+$ roslaunch pose_graph_backend pose_graph_node_simulation.launch num_agents:=3
+```
+It is possible now to launch the path-planning pipeline. On the server's PC:
+```
+$ roslaunch multi_robot_global_planner mrp_global_planner_chemical_plant_three_twist.launch
+```
+On the agents' PCs, run on the respective PCs:
+```
+$ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=0
+$ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=0
+
+$ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=1
+$ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=1
+
+$ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=2
+$ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=2
+```
+Once everything is properly set up, it is possible to run the experiment. First, initialize MSF for all the agents:
+```
+$ rosservice call /firefly_0/pose_sensor_vins_0/pose_sensor/initialize_msf_scale "scale: 1.0"
+$ rosservice call /firefly_1/pose_sensor_vins_1/pose_sensor/initialize_msf_scale "scale: 1.0"
+$ rosservice call /firefly_2/pose_sensor_vins_2/pose_sensor/initialize_msf_scale "scale: 1.0"
+```
+Then, start the planning:
+```
+$ rosservice call /multi_robot_global_planner/plan "{}"
+```  
+It is possible to trigger the `Return-Home` behaviour by publishing on the topic:
+```
+$ rostopic pub /multi_robot_global_planner/return_home std_msgs/Int16 "data: 0" -1
+```
+where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home.
 
 ## Troubleshooting
 * If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
