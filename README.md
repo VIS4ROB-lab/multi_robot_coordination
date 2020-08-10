@@ -8,16 +8,15 @@ The video can be found [here](https://www.youtube.com/watch?v=BlFbiuV-d10).
 ## Project Overview
 This repository contains all the instructions to install and run the multi-robot planning pipeline described in the paper above. In particular, the pipeline is composed of many different components that run either on the server or on the agents.  
 On the server side, the main components are:
-* Multi-robot Global Planner
-* Pose Graph Backend
-* Multi-agent Voxblox  
+* Multi-robot Global Planner - this repository
+* Pose Graph Backend - [link](https://github.com/VIS4ROB-lab/pose_graph_backend)
+* Multi-agent Voxblox - [link](https://github.com/VIS4ROB-lab/voxblox_multi_agent)  
 
 Onboard each agent, the main components are:
-* Client-server version of VINS-Mono
-* Local Obstacle avoidance
-* Dense stereo fusion
+* Client-server version of VINS-Mono - [link](https://github.com/VIS4ROB-lab/vins_client_server)
+* Local Obstacle avoidance -  this repository
 
-The experiences collected by all the agents are sent to the central server, where an optimization-based pose-graph backend fuses all of them. The backend generates a globally consistent map of the navigation environment and localizes the agents in it. This map is used by the global planner, that coordinates the motions of the robots navigating them towards the respective goal positions.
+The experiences collected by all the agents are sent to the central server, where an optimization-based pose-graph backend fuses all of them. The backend generates a globally consistent map of the navigation environment and localizes the agents in it. This map is used by the global planner, that coordinates the motions of the robots navigating them towards the respective goal positions.  
 
 ## Installation instructions
 Install Ubuntu 18.04 and ROS Melodic. Install these dependencies:
