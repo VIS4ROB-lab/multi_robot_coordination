@@ -91,7 +91,13 @@ $ cp resources/chemical_plant.tar.xz ~/.gazebo/models  # Copy to Gazebo models f
 $ cd ~/.gazebo/models/
 $ tar -xvf chemical_plant.tar.xz  # Unzip
 $ rm chemical_plant.tar.xz  # Remove zip file
+```  
+To test if the model has been properly set, run:
 ```
+$ roslaunch multi_robot_simulation mav_sim_example.launch world:=chemical-plant run_gazebo_gui:=true
+```
+The model will take some time to load. When it is done, you should be able to see the model imported in Gazebo.
+
 #### Note
 Running the experiments with more than one agent is not recommended on a single PC, unless you have a particularly powerful PC (since it would be running visual-inertial odometry, pointcloud filtering, Pose Graph optimization, loop detection, mesh reconstruction and path planning for every agent).  
 In general, it is recommended to outsource some of the computations to external PCs. In particular, we recommend to run on a central server:
