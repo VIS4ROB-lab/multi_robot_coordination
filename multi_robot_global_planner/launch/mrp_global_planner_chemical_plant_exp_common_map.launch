@@ -1,0 +1,71 @@
+<launch>
+  <arg name="mav_name"              default="firefly"/>
+  <arg name="voxel_size"            default="0.5"/>
+  <arg name="num_agents"            default="2"/>
+  <arg name="launch_prefix"         default=""/>
+  <arg name="launch_prefix_voxblox" default=""/>
+  
+  <arg name="param_file"            default="$(find multi_robot_global_planner)/cfg/parameters_chemical_plant_exp_common_map_two.yaml" />
+  <arg name="waypoints_file"        default="$(find multi_robot_global_planner)/cfg/waypoints/waypoints_chemical_plant_exp_common_map_two.yaml" />
+
+  <!-- Global Planner -->
+  <node name="multi_robot_global_planner" pkg="multi_robot_global_planner" type="multi_robot_global_planner_node" output="screen" args="-alsologtostderr" clear_params="true" launch-prefix="$(arg launch_prefix)">
+    <rosparam command="load"      file="$(arg param_file)" />
+    <rosparam command="load"      file="$(arg waypoints_file)" />
+    <param name="num_agents"      value="$(arg num_agents)" />
+    <param name="tsdf_voxel_size" value="$(arg voxel_size)" />
+    <param name="voxel_size"      value="$(arg voxel_size)" />
+       
+    <!-- Map -->
+    <remap from="multi_robot_global_planner/esdf_map_in" to="esdf_map" />
+    <remap from="multi_robot_global_planner/tsdf_map_in" to="tsdf_map" />
+       
+    <!-- Agent 0 -->
+    <remap from="map_to_world0" to="/pose_graph_backend/map_to_world0" />
+    <remap from="odom_to_map0"  to="/pose_graph_backend/odom_to_map0" />	
+    <remap from="odometry_0"    to="/$(arg mav_name)_0/msf_core/odometry" />	
+       
+    <!-- Agent 1 -->
+    <remap from="map_to_world1" to="/pose_graph_backend/map_to_world1" />
+    <remap from="odom_to_map1"  to="/pose_graph_backend/odom_to_map1" />	
+    <remap from="odometry_1"    to="/$(arg mav_name)_1/msf_core/odometry" />	
+  </node>
+
+  <!-- VOXBLOX -->
+  <node name="voxblox_node" pkg="voxblox_ros" type="esdf_server" output="screen" args="-alsologtostderr" clear_params="true" launch-prefix="$(arg launch_prefix_voxblox)">
+
+    <remap from="voxblox_node/esdf_map_out" to="esdf_map" />
+   	<remap from="voxblox_node/tsdf_map_out" to="tsdf_map" />
+
+    <remap from="pointcloud_transform0"     to="/pose_graph_backend/pcl_transform0"/>
+    <remap from="pointcloud_transform1"     to="/pose_graph_backend/pcl_transform1"/>
+
+    <param name="use_tf_transforms"         value="true"/>
+    <param name="world_frame"               value="world"/>
+    <param name="num_agents"                value="$(arg num_agents)"/>
+    <remap from="transform"                 to="/pose_graph_backend/transform0"/>
+       
+    <param name="publish_tsdf_map"          value="true" />
+    <param name="publish_esdf_map"          value="true" />
+    <param name="publish_slices"            value="true" />
+    <param name="publish_pointclouds"       value="true" />
+    <param name="publish_traversable"       value="true"/>
+
+    <param name="use_freespace_pointcloud"  value="false" />
+    <param name="tsdf_voxel_size"           value="$(arg voxel_size)" />
+    <param name="voxel_size"                value="$(arg voxel_size)" />
+    <param name="tsdf_voxels_per_side"      value="16" />
+    <param name="voxel_carving_enabled"     value="true" />
+    <param name="color_mode"                value="colors" />
+    <param name="verbose"                   value="false" />
+    <param name="update_mesh_every_n_sec"   value="1.0" />
+    <param name="slice_level"               value="-0.5" />
+    <param name="method"                    value="fast" />
+    <param name="use_const_weight"          value="false" />
+    <param name="max_ray_length_m"          value="7"/>
+    <param name="pointcloud_queue_size"     value="20"/>
+    <param name="min_ray_length_m"          value="0.15"/>
+    <param name="clear_sphere_radius"       value="0.5"/>
+  </node>
+
+</launch>

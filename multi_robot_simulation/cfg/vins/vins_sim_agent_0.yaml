@@ -3,7 +3,7 @@
 #common parameters
 imu_topic: "/firefly_0/vi_sensor/imu"
 image_topic: "/firefly_0/vi_sensor/left/image_raw"
-output_path: "/home/luca/workspaces/arche_ws/src/multi_robot_planning/multi_robot_simulation/dump"
+output_path: "/home/luca/workspaces/multi_uav_ws/src/multi_robot_coordination/multi_robot_simulation/dump"
 
 #camera calibration 
 model_type: PINHOLE
