@@ -21,6 +21,7 @@ The experiences collected by all the agents are sent to the central server, wher
 ## Installation instructions
 Install Ubuntu 18.04 and ROS Melodic. Install these dependencies:
 ```
+$ sudo apt install git libv4l-dev libsuitesparse-dev libnlopt-dev
 $ sudo apt install python-catkin-tools python-wstool ros-melodic-joy ros-melodic-octomap-ros protobuf-compiler libgoogle-glog-dev ros-melodic-mav-msgs ros-melodic-mav-planning-msgs ros-melodic-sophus ros-melodic-hector-gazebo-plugins ros-melodic-pcl-ros ros-melodic-pcl-conversions libatlas-base-dev python-matplotlib python-numpy
 $ sudo apt install liblapacke-dev libode6 libompl-dev libompl12 libopenexr-dev libglm-dev
 $ sudo apt install clang-format
@@ -33,6 +34,7 @@ $ cd catkin_ws
 ```
 Set-up the workspace:
 ```
+$ source /opt/ros/melodic/setup.bash
 $ catkin init
 $ catkin config --extend /opt/ros/melodic
 $ catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
@@ -42,6 +44,7 @@ $ catkin config --merge-devel
 Clone the dependencies:
 ```
 $ cd ~/catkin_ws/src
+$ git clone git@github.com:VIS4ROB-lab/multi_robot_coordination.git # Https: git clone https://github.com/VIS4ROB-lab/multi_robot_coordination.git
 $ wstool init
 $ wstool merge multi_robot_coordination/dependencies_ssh.rosinstall # To clone with https: multi_robot_coordination/dependencies_https.rosinstall
 $ wstool up -j8

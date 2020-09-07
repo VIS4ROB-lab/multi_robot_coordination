@@ -7,6 +7,7 @@
 - git: {local-name: opencv3_catkin, uri: 'git@github.com:ethz-asl/opencv3_catkin.git'}
 - git: {local-name: doxygen_catkin, uri: 'git@github.com:ethz-asl/doxygen_catkin.git'}
 - git: {local-name: opengv, uri: 'git@github.com:ethz-asl/opengv.git'}
+- git: {local-name: libnabo, uri: 'git@github.com:ethz-asl/libnabo.git'}
 - git: {local-name: ethzasl_brisk, uri: 'git@github.com:ethz-asl/ethzasl_brisk.git'}
 - git: {local-name: aslam_cv2, uri: 'git@github.com:ethz-asl/aslam_cv2.git'}
 - git: {local-name: mav_comm, uri: 'git@github.com:ethz-asl/mav_comm.git'}
