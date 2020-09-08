@@ -42,7 +42,7 @@
   </node>
 
   <!-- VOXBLOX -->
-  <node name="voxblox_node" pkg="voxblox_ros" type="esdf_server" output="screen" args="-alsologtostderr" clear_params="true" launch-prefix="$(arg launch_prefix_voxblox)">
+  <node name="voxblox_node" pkg="voxblox_ros" type="esdf_pose_graph_server" output="screen" args="-alsologtostderr" clear_params="true" launch-prefix="$(arg launch_prefix_voxblox)">
 
     <remap from="voxblox_node/esdf_map_out" to="esdf_map" />
     <remap from="voxblox_node/tsdf_map_out" to="tsdf_map" />

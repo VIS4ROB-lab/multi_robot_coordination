@@ -54,7 +54,7 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
@@ -66,7 +66,7 @@ Visualization Manager:
       Tree:
         {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Class: rviz/Group
       Displays:
         - Class: rviz/MarkerArray
@@ -82,17 +82,27 @@ Visualization Manager:
           Marker Topic: /multi_robot_global_planner/global_waypoints
           Name: Global Waypoints
           Namespaces:
-            {}
+            borders: true
+            waypoints_0: true
+            waypoints_1: true
+            waypoints_2: true
+            waypoints_3: true
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
-          Enabled: false
+          Enabled: true
           Marker Topic: /multi_robot_global_planner/global_path
           Name: Global Paths
           Namespaces:
             {}
           Queue Size: 100
-          Value: false
+          Value: true
+        - Class: voxblox_rviz_plugin/VoxbloxMesh
+          Enabled: true
+          Name: VoxbloxMesh
+          Topic: /voxblox_node/mesh
+          Unreliable: false
+          Value: true
       Enabled: true
       Name: Maps & Global Paths
     - Class: rviz/Group
@@ -350,6 +360,91 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: Agent 2
+    - Class: rviz/Group
+      Displays:
+        - Angle Tolerance: 0.009999999776482582
+          Class: rviz/Odometry
+          Covariance:
+            Orientation:
+              Alpha: 0.5
+              Color: 255; 255; 127
+              Color Style: Unique
+              Frame: Local
+              Offset: 1
+              Scale: 1
+              Value: true
+            Position:
+              Alpha: 0.30000001192092896
+              Color: 204; 51; 204
+              Scale: 1
+              Value: true
+            Value: true
+          Enabled: true
+          Keep: 1
+          Name: Odometry_agent3
+          Position Tolerance: 0.009999999776482582
+          Shape:
+            Alpha: 1
+            Axes Length: 1
+            Axes Radius: 0.10000000149011612
+            Color: 245; 121; 0
+            Head Length: 0.6000000238418579
+            Head Radius: 0.20000000298023224
+            Shaft Length: 2
+            Shaft Radius: 0.10000000149011612
+            Value: Arrow
+          Topic: /firefly_3/odometry
+          Unreliable: false
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /firefly_3/agent_local_planner_3/ring_buffer/occupied
+          Name: Local Occupancy Map - Agent 3
+          Namespaces:
+            {}
+          Queue Size: 1
+          Value: true
+        - Class: rviz/MarkerArray
+          Enabled: false
+          Marker Topic: /firefly_3/agent_local_planner_3/optimal_trajectory
+          Name: Opt Traj - Agent 3
+          Namespaces:
+            {}
+          Queue Size: 1
+          Value: false
+        - Class: rviz/MarkerArray
+          Enabled: false
+          Marker Topic: /firefly_3/agent_local_planner_3/global_reference
+          Name: Global Reference - Agent 3
+          Namespaces:
+            {}
+          Queue Size: 1
+          Value: false
+        - Alpha: 1
+          Buffer Length: 1
+          Class: rviz/Path
+          Color: 25; 255; 0
+          Enabled: true
+          Head Diameter: 0.07400000095367432
+          Head Length: 0.10000000149011612
+          Length: 0.30000001192092896
+          Line Style: Lines
+          Line Width: 0.029999999329447746
+          Name: Command - Agent 3
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0
+          Pose Color: 255; 85; 255
+          Pose Style: Arrows
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.05000000074505806
+          Shaft Length: 0.05000000074505806
+          Topic: /firefly_3/command_visual
+          Unreliable: false
+          Value: true
+      Enabled: true
+      Name: Agent 3
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

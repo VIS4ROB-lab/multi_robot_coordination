@@ -107,7 +107,8 @@ To test if the model has been properly set, run:
 ```
 $ roslaunch multi_robot_simulation mav_sim_example.launch world:=chemical-plant run_gazebo_gui:=true
 ```
-The model will take some time to load. When it is done, you should be able to see the model imported in Gazebo.
+The model will take some time to load. When it is done, you should be able to see the model imported in Gazebo.  
+**Note**: a decently powerful PC is required to be able to use this 3D model in Gazebo. If this model is too big, replace it with a smaller one. [This website](https://sketchfab.com/) is a good source of models.
 
 #### Note
 Running the experiments with more than one agent is not recommended on a single PC, unless you have a particularly powerful PC (since it would be running visual-inertial odometry, pointcloud filtering, Pose Graph optimization, loop detection, mesh reconstruction and path planning for every agent).  
@@ -151,23 +152,25 @@ In this experiment, we show how to run the complete pipeline in order to perform
 First, start the simulation:
 ```
 $ roslaunch multi_robot_simulation mav_sim_chemical_plant_four.launch
-```
-Once the simulation is started (i.e. wait for all the agents to be visible in RViz), it is possible to launch VINS-Mono and the mapping pipeline for every agent. These nodes should run onboard each agent's PC. For the first agent:
+```  
+
+Once the simulation is started (i.e. wait for all the agents to be visible in RViz), it is possible to launch VINS-Mono and the mapping pipeline for every agent. These nodes should run onboard each agent's PC. For the first agent (highest priority is assigned to agent 0):
 ```
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=0
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_0.launch
+$ roslaunch agent_local_planner agent_mapping_four_sim_0.launch
 ```
 Repeat the same operation for all the agents, launching the nodes in the respective PCs:
 ```
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=1
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_1.launch
+$ roslaunch agent_local_planner agent_mapping_four_sim_1.launch
 
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=2
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_2.launch
+$ roslaunch agent_local_planner agent_mapping_four_sim_2.launch
 
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=3
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_3.launch
+$ roslaunch agent_local_planner agent_mapping_four_sim_3.launch
 ```  
+
 On the server's side, start the pose graph and wait for the initialization to be done:
 ```
 $ roslaunch pose_graph_backend pose_graph_node_simulation.launch num_agents:=4
@@ -175,7 +178,8 @@ $ roslaunch pose_graph_backend pose_graph_node_simulation.launch num_agents:=4
 It is possible now to launch the path-planning pipeline. On the server's PC:
 ```
 $ roslaunch multi_robot_global_planner mrp_global_planner_chemical_plant_four.launch
-```
+```  
+
 On the agents' PCs, run on the respective PCs:
 ```
 $ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=0
@@ -190,7 +194,7 @@ $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=2
 $ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=3
 $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=3
 ```
-Once everything is properly set up, it is possible to run the experiment. First, initialize MSF for all the agents:
+Once the `Pose Graph` has initialized all the transformations (i.e. when the message `GPS covariance: XXX` is not printed anymore in the terminal), it is possible to run the experiment. First, initialize MSF for all the agents:
 ```
 $ rosservice call /firefly_0/pose_sensor_vins_0/pose_sensor/initialize_msf_scale "scale: 1.0"
 $ rosservice call /firefly_1/pose_sensor_vins_1/pose_sensor/initialize_msf_scale "scale: 1.0"
@@ -216,12 +220,12 @@ $ roslaunch multi_robot_simulation mav_sim_chemical_plant_exp_common_map.launch
 Once the simulation is started (i.e. wait for all the agents to be visible in RViz), it is possible to launch VINS-Mono and the mapping pipeline for every agent. These nodes should run onboard each agent's PC. For the first agent:
 ```
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=0
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_0.launch
+$ roslaunch agent_local_planner agent_mapping_two_sim_0.launch
 ```
 Repeat the same operation for the other agent:
 ```
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=1
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_1.launch
+$ roslaunch agent_local_planner agent_mapping_two_sim_1.launch
 ```  
 On the server's side, start the pose graph and wait for the initialization to be done:
 ```
@@ -263,15 +267,15 @@ $ roslaunch multi_robot_simulation mav_sim_chemical_plant_three_twist.launch
 Once the simulation is started (i.e. wait for all the agents to be visible in RViz), it is possible to launch VINS-Mono and the mapping pipeline for every agent. These nodes should run onboard each agent's PC. For the first agent:
 ```
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=0
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_0.launch
+$ roslaunch agent_local_planner agent_mapping_three_sim_0.launch
 ```
 Repeat the same operation for all the agents, launching the nodes in the respective PCs:
 ```
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=1
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_1.launch
+$ roslaunch agent_local_planner agent_mapping_three_sim_1.launch
 
 $ roslaunch multi_robot_simulation vins_sim.launch agent_id:=2
-$ roslaunch agent_local_planner agent_mapping_sim.launch agent_mapping_four_sim_2.launch
+$ roslaunch agent_local_planner agent_mapping_three_sim_2.launch
 ```  
 On the server's side, start the pose graph and wait for the initialization to be done:
 ```
@@ -309,7 +313,9 @@ $ rostopic pub /multi_robot_global_planner/return_home std_msgs/Int16 "data: 0" 
 where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home.
 
 ## Troubleshooting
-* If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
+* **OMPL**: If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
+* **Simulation Test**: If in the experiments the global planner outputs `[MR Global Planner] The map is empty, cannot plan`, it means that Voxblox has not received any point cloud from the `Pose Graph` yet. To solve this issue, wait a few seconds and then trigger the global planner again.
+* **Gazebo Simulation**: If the simulation is slow, replace the Chemical Plant model with a smaller one. This will require the generation of a new set of waypoints for the agents. [This website](https://sketchfab.com/) is a good source of models.
 
 ## Contributing
 Contributions that help to improve the code are welcome. In case you want to contribute, please adapt to the [Google C++ coding style](https://google.github.io/styleguide/cppguide.html/) and run `bash clang-format-all .` on your code before any commit.
