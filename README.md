@@ -12,7 +12,7 @@ If you use this code in your academic work, please cite:
 This project is released under a GPLv3 license.
 
 ## Video
-<a href="https://www.youtube.com/watch?v=BlFbiuV-d10" target="_blank"><img src="https://www.youtube.com/watch?v=BlFbiuV-d10/0.jpg" alt="Mesh" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=BlFbiuV-d10" target="_blank"><img src="https://img.youtube.com/vi/BlFbiuV-d10/0.jpg" alt="Mesh" width="240" height="180" border="10" /></a>
 
 ## Project Overview
 This repository contains all the instructions to install and run the multi-robot planning pipeline described in the paper above. In particular, the pipeline is composed of many different components that run either on the server or on the agents.  
