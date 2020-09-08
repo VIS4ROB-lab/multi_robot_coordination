@@ -194,7 +194,7 @@ $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=2
 $ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=3
 $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=3
 ```
-Once the `Pose Graph` has initialized all the transformations (i.e. when the message `GPS covariance: XXX` is not printed anymore in the terminal), it is possible to run the experiment. First, initialize MSF for all the agents:
+Once the `Pose Graph` has initialized all the transformations (i.e. when the message `GPS covariance: XXX` is not printed anymore in the terminal, or when the message `Initialized the GPS reference transformation for agent X` has been printed for every agent), it is possible to run the experiment. First, initialize MSF for all the agents:
 ```
 $ rosservice call /firefly_0/pose_sensor_vins_0/pose_sensor/initialize_msf_scale "scale: 1.0"
 $ rosservice call /firefly_1/pose_sensor_vins_1/pose_sensor/initialize_msf_scale "scale: 1.0"
@@ -243,7 +243,7 @@ $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=0
 $ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=1
 $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=1
 ```
-Once everything is properly set up, it is possible to run the experiment. First, initialize MSF for all the agents:
+Once the `Pose Graph` has initialized all the transformations (i.e. when the message `GPS covariance: XXX` is not printed anymore in the terminal, or when the message `Initialized the GPS reference transformation for agent X` has been printed for every agent), it is possible to run the experiment. First, initialize MSF for all the agents:
 ```
 $ rosservice call /firefly_0/pose_sensor_vins_0/pose_sensor/initialize_msf_scale "scale: 1.0"
 $ rosservice call /firefly_1/pose_sensor_vins_1/pose_sensor/initialize_msf_scale "scale: 1.0"
@@ -296,7 +296,7 @@ $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=1
 $ roslaunch agent_local_planner agent_local_planner_sim.launch agent_id:=2
 $ roslaunch multi_robot_simulation gps_pose_graph_initializer.launch agent_id:=2
 ```
-Once everything is properly set up, it is possible to run the experiment. First, initialize MSF for all the agents:
+Once the `Pose Graph` has initialized all the transformations (i.e. when the message `GPS covariance: XXX` is not printed anymore in the terminal, or when the message `Initialized the GPS reference transformation for agent X` has been printed for every agent), it is possible to run the experiment. First, initialize MSF for all the agents:
 ```
 $ rosservice call /firefly_0/pose_sensor_vins_0/pose_sensor/initialize_msf_scale "scale: 1.0"
 $ rosservice call /firefly_1/pose_sensor_vins_1/pose_sensor/initialize_msf_scale "scale: 1.0"
