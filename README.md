@@ -334,4 +334,4 @@ where you need to put the right agent ID in the `data` field. If you put `-1`, a
 * **Return Home**: If the planner cannot find the path towards the home position for one agent, it is likely that the home position has not been inserted in the Voxblox map. To solve this issue, make sure that the starting positions of the agents are mapped in Voxblox.
 
 ## Contributing
-Contributions that help to improve the code are welcome. In case you want to contribute, please adapt to the [Google C++ coding style](https://google.github.io/styleguide/cppguide.html/) and run `bash clang-format-all .` on your code before any commit.
+Contributions that help to improve the code are welcome. In case you want to contribute, please adapt to the [Google C++ coding style](https://google.github.io/styleguide/cppguide.html) and run `bash clang-format-all .` on your code before any commit.
