@@ -310,12 +310,13 @@ It is possible to trigger the `Return-Home` behaviour by publishing on the topic
 ```
 $ rostopic pub /multi_robot_global_planner/return_home std_msgs/Int16 "data: 0" -1
 ```
-where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home.
+where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home. Make sure that the area around the starting position of the robots has been mapped and inserted in the Voxblox map.
 
 ## Troubleshooting
 * **OMPL**: If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
 * **Simulation Test**: If in the experiments the global planner outputs `[MR Global Planner] The map is empty, cannot plan`, it means that Voxblox has not received any point cloud from the `Pose Graph` yet. To solve this issue, wait a few seconds and then trigger the global planner again.
 * **Gazebo Simulation**: If the simulation is slow, replace the Chemical Plant model with a smaller one. This will require the generation of a new set of waypoints for the agents. [This website](https://sketchfab.com/) is a good source of models.
+* **Return Home**: If the planner cannot find the path towards the home position for one agent, it is likely that the home position has not been inserted in the Voxblox map. To solve this issue, make sure that the starting positions of the agents are mapped in Voxblox.
 
 ## Contributing
 Contributions that help to improve the code are welcome. In case you want to contribute, please adapt to the [Google C++ coding style](https://google.github.io/styleguide/cppguide.html/) and run `bash clang-format-all .` on your code before any commit.
