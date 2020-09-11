@@ -14,6 +14,18 @@ This project is released under a GPLv3 license.
 ## Video
 <a href="https://www.youtube.com/watch?v=BlFbiuV-d10" target="_blank"><img src="https://img.youtube.com/vi/BlFbiuV-d10/0.jpg" alt="Mesh" width="240" height="180" border="10" /></a>
 
+## Table of Contents
+* [Project Overview](#project-overview)
+* [Installation instructions](#installation-instructions)
+* [Experiments](#experiments)
+    * [Gazebo Powerplant Experiment](#gazebo-powerplant-experiment)
+    * [Chemical Plant Experiments](#chemical-plant-experiments)
+        * [1. Map navigation with 4 agents](#1-map-navigation-with-4-agents)
+        * [2. Map re-use between agents](#2-map-re-use-between-agents)
+        * [3. Planning in same area of interest](#3-planning-in-same-area-of-interest)
+* [Troubleshooting](#troubleshooting)
+* [Contributing](#contributing)
+
 ## Project Overview
 This repository contains all the instructions to install and run the multi-robot planning pipeline described in the paper above. In particular, the pipeline is composed of many different components that run either on the server or on the agents.  
 On the server side, the main components are:
@@ -78,7 +90,10 @@ Once the building is complete, source the workspace:
 $ source devel/setup.bash
 ```
 
-## Gazebo Powerplant experiment
+## Experiments
+In the following, we illustrate how to run two experiments. In the first one, the Gazebo `Powerplant` world is used, while in the second one we show how to reproduce the experiments of the paper.
+
+### Gazebo Powerplant experiment
 In this experiment, three robots have to cover a list of user-defined waypoints in the RotorS `Powerplant` Gazebo model. In this case, the state estimates are provided by Gazebo and the pose-graph back-end will not be utilized. This experiment is meant to test and showcase the global planner.  
 First, start the simulation with:
 ```
@@ -93,7 +108,7 @@ $ roslaunch agent_local_planner agent_local_planner.launch agent_id:=2
 ```  
 To start the experiments, call the service `rosservice call /multi_robot_global_planner/plan "{}"`. It is possible to change the waypoints for the agents in the file `multi_robot_global_planner/cfg/waypoints/waypoints_powerplant.yaml`.
 
-## Chemical Plant Experiments
+### Chemical Plant Experiments
 In this section we show how to run the experiments reported in the paper in a photo-realistic environment using Gazebo. The model that will be used is the abandoned Chemical Plant in Rüdersdorf. A complete 3D model of the plant is available [here](https://sketchfab.com/3d-models/abandoned-chemical-plant-rudersdorf-rawscan-d2464ec36fb644f28e904e5517f1da64) - all credits go to the original author.  
 In order to import the model in Gazebo, follow these instructions, after having installed ROS and Gazebo and cloned this repository in a valid catkin workspace.
 ```
@@ -258,7 +273,7 @@ $ rostopic pub /multi_robot_global_planner/return_home std_msgs/Int16 "data: 0" 
 ```
 where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home.
 
-## 3. Planning in same area of interest
+### 3. Planning in same area of interest
 In the last experiment, we show the performace of the global planner when three agents have to navigate in the same area of interest.
 First, start the simulation:
 ```
