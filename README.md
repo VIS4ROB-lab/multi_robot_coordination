@@ -20,9 +20,9 @@ This project is released under a GPLv3 license.
 * [Experiments](#experiments)
     * [Gazebo Powerplant Experiment](#gazebo-powerplant-experiment)
     * [Chemical Plant Experiments](#chemical-plant-experiments)
-        1. [Map navigation with 4 agents](#1-map-navigation-with-4-agents)
-        2. [Map re-use between agents](#2-map-re-use-between-agents)
-        3. [Planning in same area of interest](#3-planning-in-same-area-of-interest)
+        _1. [Map navigation with 4 agents](#1-map-navigation-with-4-agents)
+        _2. [Map re-use between agents](#2-map-re-use-between-agents)
+        _3. [Planning in same area of interest](#3-planning-in-same-area-of-interest)
 * [Troubleshooting](#troubleshooting)
 * [Contributing](#contributing)
 
