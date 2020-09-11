@@ -84,7 +84,7 @@ First, start the simulation with:
 ```
 $ roslaunch multi_robot_simulation mav_sim_powerplant_three.launch
 ```  
-Once the simulation is started, it is possible to start the global planner and the local planners for all the agents in separate terminals:
+Once the simulation is started and the UAVs have been spawned, it is possible to start the global planner and the local planners for all the agents in separate terminals:
 ```
 $ roslaunch multi_robot_global_planner mrp_global_planner_powerplant.launch
 $ roslaunch agent_local_planner agent_local_planner.launch agent_id:=0
