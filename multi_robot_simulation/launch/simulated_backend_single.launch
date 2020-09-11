@@ -1,0 +1,30 @@
+<launch>
+
+  <arg name="params_file" default="$(find multi_robot_simulation)/cfg/parameters.yaml"/>
+  <arg name="mav_name" default="firefly"/>
+  <arg name="num_agents" default="1"/>
+  <arg name="world_frame" default="world"/>
+  <arg name="agent_frame" default="agent"/>
+  <arg name="ball_radius" default="2.0"/>
+
+  <!-- Run the tf spawner -->
+  <node name="odometry_transform_publisher" pkg="multi_robot_simulation" type="odometry_transform_publisher_node" respawn="false" clear_params="true" output="screen">
+    <rosparam file="$(arg params_file)"/>
+  </node>
+
+  <!-- Run the pointcloud interceptor -->
+  <node name="pointcloud_filter_node_0" pkg="multi_robot_simulation" type="pointcloud_filter_node"  respawn="true" clear_params="true" output="screen" args="0">
+    <param name="num_agents"    value="$(arg num_agents)" />
+    <param name="agent_id"      value="0" />
+    <param name="world_frame"   value="$(arg world_frame)" />
+    <param name="agent_frame"   value="$(arg agent_frame)" />
+    <param name="ball_radius"   value="$(arg ball_radius)" />
+    <param name="pointcloud_topic" value="/$(arg mav_name)_0/vi_sensor/camera_depth/depth/points" />
+  </node>
+
+  <node name="pointcloud_transformator" pkg="multi_robot_simulation" type="pointcloud_transformator_node" respawn="false" clear_params="true" output="screen">
+    <rosparam file="$(arg params_file)"/>
+    <remap from="/$(arg mav_name)_0/vi_sensor/camera_depth/depth/points" to="filtered_pointcloud_0"/>
+  </node>
+
+</launch>

@@ -1,0 +1,54 @@
+<launch>
+  <arg name="mav_name"       default="firefly"/>
+  <arg name="agent_id"       default="0"/>
+  <arg name="map_resolution" default="0.2"/>
+  <arg name="odometry_frame" default="odom"/>
+  <arg name="world_frame"    default="world"/>
+  <arg name="launch_prefix"  default=""/>
+
+  <group ns="$(arg mav_name)_$(arg agent_id)">
+    <node name="agent_local_planner_$(arg agent_id)" pkg="agent_local_planner" type="agent_local_planner_node" respawn="false" output="screen" args="-alsologtostderr" clear_params="true" launch-prefix="$(arg launch_prefix)">
+      <param name="agent_id"               value="$(arg agent_id)"/>
+      <param name="map_resolution"         value="$(arg map_resolution)"/>
+      <param name="odometry_frame"         value="$(arg odometry_frame)"/>
+      <param name="world_frame"            value="$(arg world_frame)"/>
+
+      <param name="vel_max"                value="2.0"/>
+      <param name="vel_max_yaw"            value="1.0"/>
+      <param name="acc_max"                value="3.0"/>
+      <param name="acc_max_yaw"            value="1.0"/>
+      <param name="dt"                     value="0.25"/>
+      <param name="dt_commands"            value="0.25"/>
+      <param name="sampling_dt"            value="0.05"/>
+      <param name="num_opt_points"         value="7"/>
+      <param name="distance_threshold"     value="1.0"/>
+      <param name="prediction_horizon_mpc" value="300"/>
+      <param name="local_goal_distance"    value="3.0"/>
+      
+      <param name="scale_factor_visualization" value="1.0"/>
+      <param name="min_z"                      value="0.0"/>
+      <param name="max_z"                      value="5.0"/>
+					 
+      <remap from="filtered_pointcloud"         to="/filtered_pointcloud_$(arg agent_id)"/>
+      <remap from="global_path_$(arg agent_id)" to="/global_path_$(arg agent_id)"/>
+      <remap from="odometry"                    to="msf_core/odometry"/>
+      <remap from="command/trajectory"          to="command/trajectory_odom"/>
+    </node>
+    
+  </group>
+  
+  <!-- For simulation with vins only: it intercepts the command from the local planner and transforms it -->
+  <node name="command_interceptor_node_$(arg agent_id)" pkg="multi_robot_simulation" type="command_interceptor_node" respawn="false" clear_params="true" output="screen" args="$(arg agent_id)">
+      <param name="controller_frame_id"     value="odom_fake_$(arg agent_id)"/>
+      <param name="state_frame_id"          value="state_$(arg agent_id)"/>
+      <param name="body_frame_id"           value="/firefly_$(arg agent_id)/base_link"/>
+      <remap from="command/trajectory_odom" to="/$(arg mav_name)_$(arg agent_id)/command/trajectory_odom"/>
+      <remap from="command/trajectory"      to="/$(arg mav_name)_$(arg agent_id)/command/trajectory"/>
+  </node>
+
+  <!--node name="pointcloud_transformator_$(arg agent_id)" pkg="multi_robot_simulation" type="pointcloud_transformator_node" respawn="false" clear_params="true" output="screen">
+      <rosparam file="$(find multi_robot_simulation)/cfg/parameters_vins.yaml"/>
+      <remap from="filterd_pointcloud" to="filterd_pointcloud_$(arg agent_id)"/>
+  </node-->
+  
+</launch>
