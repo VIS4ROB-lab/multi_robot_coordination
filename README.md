@@ -328,6 +328,8 @@ $ rostopic pub /multi_robot_global_planner/return_home std_msgs/Int16 "data: 0" 
 where you need to put the right agent ID in the `data` field. If you put `-1`, all the agents will return home. Make sure that the area around the starting position of the robots has been mapped and inserted in the Voxblox map.
 
 ## Troubleshooting
+In case of problems feel free to open an issue on GitHub or to contact the author at [lbartolomei (at) ethz (dot) ch](lbartolomei@ethz.ch).  
+In the following, we present a short list of common problems:
 * **OMPL**: If there are problems with `OMPL`, make sure that the `ROS` version is not installed: `sudo apt remove ros-melodic-ompl`.  
 * **Simulation Test**: If in the experiments the global planner outputs `[MR Global Planner] The map is empty, cannot plan`, it means that Voxblox has not received any point cloud from the `Pose Graph` yet. To solve this issue, wait a few seconds and then trigger the global planner again.
 * **Gazebo Simulation**: If the simulation is slow, replace the Chemical Plant model with a smaller one. This will require the generation of a new set of waypoints for the agents. [This website](https://sketchfab.com/) is a good source of models.
