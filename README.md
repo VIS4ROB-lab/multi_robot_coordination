@@ -1,6 +1,6 @@
 # Multi-Robot Coordination
 This repository contains a hierachical multi-robot global planner that generates paths for a team of Unmanned Aerial Vehicles (UAVs).
-If you use this code in your academic work, please cite:
+If you use this code in your academic work, please cite ([PDF](https://www.research-collection.ethz.ch/handle/20.500.11850/441280)):
 
     @inproceedings{bartolomei2020multi,
       title={Multi-robot Coordination with Agent-Server Architecture for Autonomous Navigation in Partially Unknown Environments},
